@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Songwriter Codex — Who Really Wrote It?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,800;1,500&family=Archivo+Narrow:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE6D6; --paper2:#E5DCC8; --ink:#1A1815; --ink2:#3A352C;
+    --ox:#8B2E2E; --brass:#A8842C; --hair:#C9BEA4; --label:#7A6E54;
+    --good:#3F6B43; --goodbg:#E2E8D6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Newsreader',Georgia,serif;
+    line-height:1.5;
+    /* subtle paper grain */
+    background-image:radial-gradient(rgba(120,100,60,.045) 1px, transparent 1px);
+    background-size:4px 4px;
+    min-height:100vh;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:22px 20px 60px}
+
+  /* ---- masthead ---- */
+  header{padding-bottom:14px;border-bottom:2px solid var(--ink);margin-bottom:6px}
+  .brand{font-family:'Playfair Display',serif;font-weight:800;font-size:23px;letter-spacing:-.01em}
+  .brand .c{color:var(--brass)}
+  .tag{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:.22em;
+       font-size:10px;color:var(--label);margin-top:5px}
+
+  /* ---- score strip ---- */
+  .scores{display:flex;gap:8px;margin:14px 0 4px}
+  .score{flex:1;border:1px solid var(--hair);background:rgba(255,255,255,.25);
+         text-align:center;padding:9px 4px;border-radius:3px}
+  .score b{display:block;font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1}
+  .score span{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;
+              letter-spacing:.14em;font-size:8.5px;color:var(--label);margin-top:4px;display:block}
+
+  /* ---- the card ---- */
+  .card{background:linear-gradient(180deg,#EFE9DB,#E8E0CD);
+        border:1px solid var(--hair);border-radius:5px;
+        padding:24px 22px 22px;margin-top:14px;
+        box-shadow:0 1px 0 rgba(255,255,255,.5) inset, 0 6px 18px rgba(60,45,20,.07)}
+
+  /* eyebrow — the plain-language banner */
+  .eyebrow{font-family:'Archivo Narrow',sans-serif;font-weight:700;
+           text-transform:uppercase;letter-spacing:.1em;font-size:11.5px;
+           color:var(--ox);line-height:1.35;margin-bottom:16px}
+
+  /* THE STORY — the hero. big, readable, serif. */
+  .story{font-size:20px;line-height:1.58;color:var(--ink);font-weight:400}
+  .story p{margin-bottom:0}
+
+  /* the question turn */
+  .ask{font-family:'Playfair Display',serif;font-weight:600;font-size:23px;
+       line-height:1.25;margin:22px 0 4px;color:var(--ink)}
+  .ask .song{font-style:italic}
+
+  /* options */
+  .opts{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+       background:rgba(255,255,255,.32);border:1.5px solid var(--hair);
+       border-radius:4px;padding:15px 16px;cursor:pointer;
+       font-family:'Newsreader',serif;font-size:18px;color:var(--ink);
+       transition:border-color .12s, background .12s;}
+  .opt:hover{border-color:var(--brass);background:rgba(255,255,255,.5)}
+  .opt .mk{flex:none;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--label);
+           display:grid;place-items:center;font-family:'Archivo Narrow',sans-serif;
+           font-size:13px;font-weight:600;color:var(--label)}
+  .opt:disabled{cursor:default}
+  .opt.correct{border-color:var(--good);background:var(--goodbg)}
+  .opt.correct .mk{border-color:var(--good);color:var(--good);background:var(--good);color:#fff}
+  .opt.wrong{border-color:var(--ox);background:#F0E0DD;opacity:.92}
+  .opt.wrong .mk{border-color:var(--ox);color:var(--ox)}
+  .opt.dim{opacity:.5}
+
+  /* ---- the reveal ---- */
+  .reveal{margin-top:20px;display:none}
+  .reveal.show{display:block;animation:rise .35s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .verdict{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;
+           letter-spacing:.14em;font-size:12px;font-weight:700;margin-bottom:10px}
+  .verdict.win{color:var(--good)}
+  .verdict.lose{color:var(--ox)}
+  .teach{font-size:18.5px;line-height:1.56;color:var(--ink2)}
+  .locator{margin-top:16px;padding:12px 14px;border-left:3px solid var(--ox);
+           background:rgba(139,46,46,.06);border-radius:0 4px 4px 0;
+           font-family:'Archivo Narrow',sans-serif;font-size:14.5px;color:var(--ink2)}
+  .locator b{color:var(--ox);font-weight:700;display:block;font-size:11px;
+             text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+  .next{margin-top:20px;width:100%;background:var(--ink);color:var(--paper);
+        border:none;border-radius:4px;padding:17px;cursor:pointer;
+        font-family:'Archivo Narrow',sans-serif;font-weight:700;
+        text-transform:uppercase;letter-spacing:.12em;font-size:15px}
+  .next:hover{background:#000}
+
+  footer{margin-top:24px;text-align:center;font-family:'Archivo Narrow',sans-serif;
+         font-size:12px;color:var(--label);line-height:1.6}
+  footer em{font-style:italic;color:var(--ink2)}
+  .ver{margin-top:9px;font-size:8.5px;letter-spacing:.1em;color:var(--hair);text-transform:uppercase}
+
+  @media(max-width:480px){
+    .story{font-size:18.5px} .ask{font-size:21px} .opt{font-size:17px} .teach{font-size:17.5px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important}}
+
+  /* ---- filter control + panel ---- */
+  .filterbar{display:flex;justify-content:flex-end;margin:-6px 0 14px}
+  .filterbtn{
+    font-family:'Archivo Narrow',sans-serif;font-weight:600;font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--label);background:none;border:1px solid var(--hair);
+    border-radius:20px;padding:6px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;
+    transition:all .15s;
+  }
+  .filterbtn:hover{border-color:var(--brass);color:var(--ink2)}
+  .filterbtn .dot{width:6px;height:6px;border-radius:50%;background:var(--good);display:inline-block}
+  .filterbtn.allon .dot{display:none}
+  .panel{
+    overflow:hidden;max-height:0;transition:max-height .32s ease;
+    background:var(--paper2);border-radius:12px;margin-bottom:16px;
+  }
+  .panel.open{max-height:760px}
+  .panelinner{padding:18px 18px 20px;border:1px solid var(--hair);border-radius:12px}
+  .panelhead{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--label);margin:0 0 4px}
+  .panelsub{font-size:13px;color:var(--ink2);font-style:italic;margin:0 0 14px;line-height:1.4}
+  .pgroup{margin-bottom:16px}
+  .pgroup:last-child{margin-bottom:6px}
+  .pgrouptitle{font-family:'Archivo Narrow',sans-serif;font-weight:600;font-size:12px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ox);margin:0 0 9px;display:flex;justify-content:space-between;align-items:center}
+  .pgrouptitle .mini{font-size:10px;color:var(--label);text-transform:none;letter-spacing:0;cursor:pointer;font-weight:500}
+  .pgrouptitle .mini:hover{color:var(--brass);text-decoration:underline}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    font-family:'Archivo Narrow',sans-serif;font-weight:500;font-size:13px;
+    padding:6px 12px;border-radius:18px;cursor:pointer;border:1px solid var(--hair);
+    background:transparent;color:var(--label);transition:all .12s;user-select:none;
+  }
+  .chip.on{background:var(--good);border-color:var(--good);color:#F4F0E4;font-weight:600}
+  .chip:active{transform:scale(.95)}
+  .paneldone{
+    width:100%;margin-top:14px;font-family:'Archivo Narrow',sans-serif;font-weight:700;
+    font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#F4F0E4;
+    background:var(--ink);border:none;border-radius:8px;padding:12px;cursor:pointer;
+  }
+  .paneldone:active{background:var(--ink2)}
+  .panelnote{font-size:12px;color:var(--ox);text-align:center;margin-top:10px;min-height:16px;font-style:italic}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">The Songwriter <span class="c">Codex</span></div>
+    <div class="tag">Who Really Wrote It?</div>
+  </header>
+
+  <div class="scores">
+    <div class="score"><b id="sStreak">0</b><span>Streak</span></div>
+    <div class="score"><b id="sBest">0</b><span>Best</span></div>
+    <div class="score"><b id="sSeen">0</b><span>Played</span></div>
+    <div class="score"><b id="sClose">0</b><span>Got It</span></div>
+  </div>
+
+
+  <div class="filterbar">
+    <button class="filterbtn allon" id="filterBtn" onclick="togglePanel()">
+      <span class="dot"></span><span id="filterBtnLabel">Filter</span>
+    </button>
+  </div>
+
+  <div class="panel" id="panel">
+    <div class="panelinner">
+      <div class="panelhead">What do you want to be asked about?</div>
+      <div class="panelsub">Everything is on by default. Tap to turn a genre or era off. The book is about how the music connects, so picking an era still lets older writers appear when they connect to it.</div>
+
+      <div class="pgroup">
+        <div class="pgrouptitle">Genres <span class="mini" onclick="allGenres(true)">all on</span></div>
+        <div class="chips" id="genreChips"></div>
+      </div>
+
+      <div class="pgroup">
+        <div class="pgrouptitle">Eras <span class="mini" onclick="allEras(true)">all on</span></div>
+        <div class="chips" id="eraChips"></div>
+      </div>
+
+      <div class="panelnote" id="panelNote"></div>
+      <button class="paneldone" onclick="togglePanel()">Done</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow" id="eyebrow"></div>
+    <div class="story" id="story"></div>
+    <div class="ask" id="ask"></div>
+    <div class="opts" id="opts"></div>
+
+    <div class="reveal" id="reveal">
+      <div class="verdict" id="verdict"></div>
+      <div class="teach" id="teach"></div>
+      <div class="locator" id="locator"><b>Read more in the book</b><span id="locText"></span></div>
+      <button class="next" id="next">Next Story</button>
+    </div>
+  </div>
+
+  <footer>
+    Every story here is true, and comes from<br>
+    <em>The Songwriter Codex</em> by Craig W. Tomarkin.
+    <div class="ver">Drawn from the book &middot; verified against manuscript v124</div>
+  </footer>
+</div>
+
+<script>
+const QUESTIONS = [{"kind": "who wrote it", "eyebrow": "Everyone knows this song. Almost no one knows who wrote it.", "story": "Aretha Franklin's \"Respect\" is one of the most famous songs in American music, but she didn't write it. The man who did wrote it and sang it first: a soul singer from Georgia who died in a plane crash at 26, just days after recording the biggest song of his life. Even the Beatles were listening. George Harrison said one of their own songs was built on this man's \"Respect.\"", "ask": "So who wrote \"Respect\"?", "answer": "Otis Redding", "options": ["Otis Redding", "Sam Cooke", "Marvin Gaye"], "reveal": "It was Otis Redding. He wrote \"Respect\" in 1965; two years later Aretha recorded her version and made it hers forever. That is exactly how this works. We remember the voice and forget the writer. Otis never saw how big the song became. He died that same year.", "locator": "He's in the Soul & R&B chapter, around the middle of the book.", "allowFamousNonCorpus": false, "genres": ["Soul / R&B"], "eras": ["founders", "rise"]}, {"kind": "who wrote it", "eyebrow": "You've heard it a hundred times. Now meet the writer.", "story": "Whitney Houston's \"I Will Always Love You\" is one of the best-selling singles ever recorded. But Whitney didn't write it. A country songwriter wrote it twenty years earlier as a goodbye to a business partner. She is as famous for her big hair and her theme park as for her songwriting.", "ask": "Who wrote \"I Will Always Love You\"?", "answer": "Dolly Parton", "options": ["Dolly Parton", "Loretta Lynn", "Taylor Swift"], "reveal": "It was Dolly Parton. She wrote it in 1973 and kept the publishing rights, which is why Whitney's blockbuster version made Dolly a fortune. Two huge stars, one song, and the woman who actually wrote it standing a little out of the spotlight.", "locator": "She's in the Country chapter.", "allowFamousNonCorpus": false, "genres": ["Country", "Pop"], "eras": ["modern", "rise"]}, {"kind": "who wrote it", "eyebrow": "The King didn't write the King's songs.", "story": "\"Hound Dog\" is one of Elvis Presley's signature songs, but he didn't write it, and he wasn't even the first to record it. Two young songwriters wrote it years earlier for a different singer, a Black woman named Big Mama Thornton, whose version came first. The same two men went on to write \"Stand By Me\" and \"Jailhouse Rock.\"", "ask": "Who wrote \"Hound Dog\"?", "answer": "Leiber and Stoller", "options": ["Leiber and Stoller", "Chuck Berry", "Little Richard"], "reveal": "It was Jerry Leiber and Mike Stoller, a songwriting team who wrote hit after hit for other people to sing. Elvis made \"Hound Dog\" famous, but the writing, and the credit, belongs to them. Elvis himself always said he never wrote a song.", "locator": "They're in the Soul & R&B chapter.", "allowFamousNonCorpus": false, "genres": ["Rock"], "eras": ["rise"]}, {"kind": "invented a new kind", "eyebrow": "Three of these perfected music. One changed what a song could do.", "story": "Most great songwriters get really good at a kind of music that already exists. A rare few change what a song can do, and everyone after them follows. One of these four did that: he brought the depth of real literature into the three-minute pop song, so that a hit on the radio could be about ideas, not just love. The other three wrote beautiful songs in styles that were already there.", "ask": "Which one changed what a song could be about?", "answer": "Bob Dylan", "options": ["Bob Dylan", "Roy Orbison", "Harry Nilsson"], "reveal": "It was Bob Dylan. Before him, pop songs were mostly about love. He filled them with the weight of poetry and books, and proved a song could be about anything, a whole way of seeing the world, and still reach number one. He didn't invent folk or protest music; he inherited those. What he invented was how much a popular song could carry.", "locator": "He's near the very top of the Folk chapter.", "allowFamousNonCorpus": false, "genres": ["Folk / Americana", "Pop"], "eras": ["golden", "rise"]}, {"kind": "invented a new kind", "eyebrow": "One of these built a sound the whole world copied.", "story": "In 1954 a blind piano player from Georgia walked into a studio and did something nobody had done: he took church gospel music and pointed it at love and desire instead of God. People called it blasphemy at the time. Today we just call it soul music, and almost everyone who came after built on what he started that day.", "ask": "Who took gospel and turned it into soul?", "answer": "Ray Charles", "options": ["Ray Charles", "Sam Cooke", "Marvin Gaye"], "reveal": "It was Ray Charles. That one move, gospel feeling aimed at earthly things, became the foundation of soul, and then R&B, and a thread that runs all the way into the music on the radio today. He didn't perfect a style. He started one.", "locator": "He's near the top of the Soul & R&B chapter.", "allowFamousNonCorpus": false, "genres": ["Soul / R&B"], "eras": ["founders", "rise"]}, {"kind": "did they write it", "eyebrow": "Most singers don't write their hits. One of these did.", "story": "Here is something most people never realize: a lot of your favorite singers didn't write the songs they're famous for. Someone else wrote the words and the music, and the singer just brought the voice. Two of these three are singing somebody else's song. Only one actually wrote their own.", "ask": "Which of these wrote the hit they're known for?", "answer": "Bee Gees \u2014 \"Stayin' Alive\"", "options": ["Bee Gees \u2014 \"Stayin' Alive\"", "Elvis Presley \u2014 \"Hound Dog\"", "Whitney Houston \u2014 \"I Will Always Love You\""], "reveal": "The Bee Gees wrote \"Stayin' Alive\" themselves. The other three are all singing songs written by someone else: Elvis sang Leiber and Stoller's \"Hound Dog,\" Whitney sang Dolly Parton's song, and Aretha sang Otis Redding's. The singer we remember; the writer we forget.", "locator": "The Bee Gees are in the Soul & R&B chapter.", "allowFamousNonCorpus": true, "genres": [], "eras": []}, {"kind": "the forgotten one", "eyebrow": "He built the music. They almost forgot his name.", "story": "This person basically invented gospel music, the whole sound that soul, R&B, and a lot of rock later grew out of. They wrote \"Take My Hand, Precious Lord,\" the song Martin Luther King requested on the final night before the assassination. But they handed their songs to other people to sing and never chased fame, so the famous lists rank them near the very bottom, if they list them at all.", "ask": "Who is this forgotten founder of gospel?", "answer": "Thomas A. Dorsey", "options": ["Thomas A. Dorsey", "Mahalia Jackson", "Curtis Mayfield"], "reveal": "It was Thomas A. Dorsey. The official lists put him near last; this book, which measures what people actually built, puts him near the top. The distance between those two is the single biggest gap in the whole book. He didn't get forgotten by accident. He got absorbed into everything that came after.", "locator": "He's high up in the Gospel chapter.", "allowFamousNonCorpus": true, "genres": ["Gospel", "Soul / R&B"], "eras": ["founders", "rise"]}, {"kind": "which one of them", "eyebrow": "Almost every Beatles song was written by two of them. This one, by just one.", "story": "Most Beatles songs were written by the team of two. But \"Yesterday\" was written by a single member, alone. He woke up one morning with the whole melody already in his head, and for weeks he was so sure he must have stolen it from an old song that he played it for people asking if they recognized it. Nobody did. It was his.", "ask": "Which Beatle wrote \"Yesterday\"?", "answer": "Paul McCartney", "options": ["Paul McCartney", "John Lennon", "George Harrison"], "reveal": "It was Paul McCartney. \"Yesterday\" is one of the most covered songs in history, and it came to him in a dream. Knowing it's a Beatles song was never the hard part. The question is which one, and this one was all McCartney.", "locator": "He's at the very top of the book, in the Pop chapter.", "allowFamousNonCorpus": true, "genres": ["Pop"], "eras": ["rise"]}, {"kind": "hard to believe", "eyebrow": "One of the greatest songwriters ever, and a hall of fame left him out.", "story": "This man wrote some of the most elegant songs in American music, the kind Frank Sinatra and Ella Fitzgerald built careers on, songs like \"Night and Day\" and \"I've Got You Under My Skin.\" He's considered one of the finest songwriters who ever lived. And yet the Rock and Roll Hall of Fame has never let him in, because his music came from a different world than rock.", "ask": "Which songwriting giant is not in the Rock Hall?", "answer": "Cole Porter", "options": ["Cole Porter", "Paul McCartney", "Stevie Wonder"], "reveal": "It was Cole Porter. The book argues that getting into a hall of fame and actually building great music are two different things that often come apart, and Porter is proof: a writer of the highest order the rock institution was simply never built to recognize.", "locator": "He's near the top of the Songbook chapter.", "allowFamousNonCorpus": false, "genres": ["Pop", "Songbook", "Soul / R&B"], "eras": ["founders", "rise"]}, {"kind": "the listeners knew", "eyebrow": "Nobody told the computer these two belonged together. It figured it out.", "story": "The book looked at 226 billion times real people pressed play on a song, and let a computer find which artists sit closest together, just from listening habits. No history was fed in. And it placed two men right next to each other as the closest pair in the whole book: the two who built rock and roll side by side, from the same blues, for the same kids, at the same moment.", "ask": "Which two did the listening data place closest together?", "answer": "Chuck Berry and Fats Domino", "options": ["Chuck Berry and Fats Domino", "Elvis and Buddy Holly", "Lennon and McCartney"], "reveal": "It was Chuck Berry and Fats Domino, and the data was right. They built rock and roll alongside each other and the listening patterns of millions of strangers, decades later, still place them shoulder to shoulder. Nobody told the computer that. The listeners knew.", "locator": "Both are in the Rock chapter; the listening maps run throughout the book.", "allowFamousNonCorpus": false, "genres": ["Rock"], "eras": ["rise"]}, {"kind": "who wrote it", "eyebrow": "The British Invasion was built on one man's songs.", "story": "When the Rolling Stones, Led Zeppelin, and Cream started out, a huge chunk of their early songs came from a single blues writer in Chicago. He wrote \"Hoochie Coochie Man,\" \"Little Red Rooster,\" \"Spoonful,\" and the song that became Led Zeppelin's \"Whole Lotta Love.\" The British bands carried his songs to millions of people who never heard the originals.", "ask": "Who wrote the Chicago blues songbook the British bands borrowed?", "answer": "Willie Dixon", "options": ["Willie Dixon", "Muddy Waters", "Howlin' Wolf"], "allowFamousNonCorpus": true, "reveal": "It was Willie Dixon. He was the writer behind the Chicago blues sound, and his songs became the foundation of British rock. The bands got famous; Dixon, the man who actually wrote the songs, stayed mostly in the background.", "locator": "He's in the Blues chapter.", "genres": ["Blues"], "eras": ["founders"]}, {"kind": "who wrote it", "eyebrow": "Sinatra, Ella, and a hundred others sang his songs.", "story": "This man wrote some of the wittiest, most elegant songs in American music: \"Night and Day,\" \"I've Got You Under My Skin,\" \"Anything Goes.\" Frank Sinatra and Ella Fitzgerald built whole careers singing his work. He's considered one of the finest songwriters who ever lived, famous for clever, surprising rhymes hidden inside the song.", "ask": "Who wrote \"Night and Day\"?", "answer": "Cole Porter", "options": ["Cole Porter", "Irving Berlin", "George Gershwin"], "reveal": "It was Cole Porter. He wrote both the words and the music, and his songs are still sung everywhere. But the singers who made them famous, Sinatra most of all, are the names people remember. The writer stays a step behind the voice.", "locator": "He's near the top of the Songbook chapter.", "genres": ["Songbook"], "eras": ["founders"]}, {"kind": "who wrote it", "eyebrow": "You know these Motown songs. One team wrote them all.", "story": "Motown was a hit factory in Detroit, and its biggest run of number ones came from a single writing and producing team. Between 1962 and 1968 they wrote the songs that defined the Motown sound, hits for the Supremes and the Four Tops like \"Stop in the Name of Love\" and \"Reach Out I'll Be There.\" They built them like clockwork: the hook in the first few seconds, a feeling you knew right away.", "ask": "Which team wrote Motown's biggest hits?", "answer": "Holland-Dozier-Holland", "options": ["Holland-Dozier-Holland", "Gamble and Huff", "Ashford and Simpson"], "reveal": "It was Holland-Dozier-Holland. They wrote and produced hit after hit for the Supremes, the Four Tops, and more, the engine behind Motown's golden years. The singers became stars; the team that actually wrote the songs worked behind the glass.", "locator": "They're in the Soul & R&B chapter.", "allowFamousNonCorpus": true, "genres": ["Soul / R&B"], "eras": ["rise"]}, {"kind": "who wrote it", "eyebrow": "A janitor at a recording studio wrote your favorite country songs.", "story": "This man showed up in Nashville in the 1960s with an Oxford education and took a job sweeping floors at a recording studio just to be near the music. In a five-year burst he wrote \"Me and Bobby McGee,\" \"Help Me Make It Through the Night,\" and \"Sunday Mornin' Comin' Down,\" proving a country song could carry real literary weight.", "ask": "Who wrote \"Me and Bobby McGee\"?", "answer": "Kris Kristofferson", "options": ["Kris Kristofferson", "Willie Nelson", "Johnny Cash"], "reveal": "It was Kris Kristofferson. Janis Joplin's version of \"Me and Bobby McGee\" became a number one hit, after her death. Like so much in this book, the song is remembered through the famous voice, while the writer stands a little out of frame.", "locator": "He's in the Country chapter.", "genres": ["Country"], "eras": ["golden", "rise"]}, {"kind": "who wrote it", "eyebrow": "Before she sang her own hits, she wrote everyone else's.", "story": "Before she became a famous singer-songwriter in the 1970s, this woman spent a decade writing hits for other people: \"Will You Love Me Tomorrow\" for the Shirelles, \"Up on the Roof\" for the Drifters, \"The Loco-Motion.\" More than a hundred hit songs, most of them sung by other artists, before she ever stepped to the microphone herself.", "ask": "Who wrote \"Will You Love Me Tomorrow\"?", "answer": "Carole King", "options": ["Carole King", "Carly Simon", "Laura Nyro"], "reveal": "It was Carole King. She wrote a wall of hits for other singers in the 1960s, then finally recorded her own album, Tapestry, and became a star in her own right. For years, though, her songs were famous and her name was not.", "locator": "She's in the Soul & R&B chapter.", "genres": ["Folk / Americana", "Soul / R&B"], "eras": ["golden", "rise"]}, {"kind": "who wrote it", "eyebrow": "Bob Dylan called this man America's greatest living poet.", "story": "This writer invented Motown's way with words: plain talk and stretched-out metaphors that made a love song feel both poetic and instantly clear. He wrote \"My Girl\" for the Temptations and \"The Tracks of My Tears.\" Bob Dylan once said, flat out, that this man is America's greatest living poet.", "ask": "Who wrote \"My Girl\"?", "answer": "Smokey Robinson", "options": ["Smokey Robinson", "Marvin Gaye", "Stevie Wonder"], "reveal": "It was Smokey Robinson. The Temptations sang \"My Girl\" and made it immortal, but Smokey wrote it. Even a song everyone can sing along to has a writer most people couldn't name.", "locator": "He's in the Soul & R&B chapter.", "genres": ["Soul / R&B"], "eras": ["rise"]}, {"kind": "invented a new kind", "eyebrow": "One of these built the blueprint for rock and roll.", "story": "Most musicians work inside a style that already exists. One of these four built a brand-new one. In a run of recordings in the late 1950s, he took the blues and translated it into something a huge mainstream audience could love, the guitar sound and the storytelling that became the template for rock and roll for the next sixty years.", "ask": "Which one built the blueprint for rock and roll?", "answer": "Chuck Berry", "options": ["Chuck Berry", "Roy Orbison", "Buddy Holly"], "allowFamousNonCorpus": true, "reveal": "It was Chuck Berry. He solved a problem nobody had solved: how to take the blues, which mainstream audiences didn't know, and turn it into music millions would buy. Everyone who picked up a guitar after him was working from his design.", "locator": "He's near the top of the Rock chapter.", "genres": ["Pop", "Rock"], "eras": ["rise"]}, {"kind": "invented a new kind", "eyebrow": "One of these recorded the future of music in two sessions.", "story": "The Delta blues already existed, one man and a guitar. But one of these four took it and packed more into it than anyone before, making the guitar a second voice that talked back to the singing. He recorded just twenty-nine songs in two sessions, then died at twenty-seven, and those songs reshaped popular music.", "ask": "Which one made the guitar a second voice?", "answer": "Robert Johnson", "options": ["Robert Johnson", "Muddy Waters", "John Lee Hooker"], "allowFamousNonCorpus": true, "reveal": "It was Robert Johnson. Rock guitarists are still trying to play what he recorded in the 1930s. He didn't invent the blues, but he transformed it so completely that everyone after had to reckon with him.", "locator": "He's in the Blues chapter.", "genres": ["Blues"], "eras": ["founders"]}, {"kind": "invented a new kind", "eyebrow": "One of these wrote the whole template for hip-hop, before it had a name.", "story": "In 1970, years before hip-hop existed as a genre, one of these artists built the entire blueprint for it: rhythmic speech over a bare groove, words used as social commentary, the singer as a witness reporting on the world. The artists who later invented hip-hop were picking up exactly what he put down.", "ask": "Which one built the template for hip-hop before it had a name?", "answer": "Gil Scott-Heron", "options": ["Gil Scott-Heron", "Grandmaster Flash", "Chuck D"], "allowFamousNonCorpus": true, "reveal": "It was Gil Scott-Heron. His \"The Revolution Will Not Be Televised\" laid out the pieces hip-hop would later assemble into a genre. He did it first, and the official lists have barely caught up with how important that was.", "locator": "He's high in the Hip-Hop chapter.", "genres": ["Hip-Hop"], "eras": ["golden", "modern"]}, {"kind": "the forgotten one", "eyebrow": "She plugged in the electric guitar before almost anyone, and got forgotten.", "story": "Long before rock and roll, one of these artists took the electric guitar, then mostly used in jazz bands, and made it carry feeling and faith in gospel music. She built a whole new way of playing, full of bends and shimmer and hard rhythm, that rock guitarists would copy decades later, often without knowing where it came from.", "ask": "Which one was the pioneer of electric gospel guitar?", "answer": "Sister Rosetta Tharpe", "options": ["Sister Rosetta Tharpe", "Mahalia Jackson", "Bessie Smith"], "allowFamousNonCorpus": true, "reveal": "It was Sister Rosetta Tharpe. She was bending and shredding on an electric guitar in the 1940s, and you can draw a straight line from her playing to the rock guitarists who followed. One of the true founders, and one of the most overlooked.", "locator": "She's in the Gospel chapter.", "genres": ["Blues", "Gospel"], "eras": ["founders"]}, {"kind": "the forgotten one", "eyebrow": "He wrote the songs the whole rock world copied, and the lists rank him near the bottom.", "story": "This man basically wrote the Chicago blues songbook that British rock was built on, songs covered by the Rolling Stones, Led Zeppelin, and Cream. His work is everywhere in rock history. And yet, because he wrote for others instead of becoming a star himself, the famous rankings place him far below the bands who borrowed from him.", "ask": "Who is this overlooked father of electric blues songwriting?", "answer": "Willie Dixon", "options": ["Willie Dixon", "Bo Diddley", "John Lee Hooker"], "allowFamousNonCorpus": true, "reveal": "It was Willie Dixon. This book, which measures what people actually built, ranks him far higher than the official lists do. He wrote the songs; other people became legends singing them. That gap is the whole point of the book.", "locator": "He's in the Blues chapter.", "genres": ["Blues", "Rock"], "eras": ["founders", "rise"]}, {"kind": "hard to believe", "eyebrow": "Only two writers in this whole book won songwriting's top Grammy twice.", "story": "The Grammy for Song of the Year is the one big Grammy that goes to the person who wrote the song, not the person who sang it. In the entire book of 164 writers, only two have ever won it more than once, and both are artists working today, not legends from the past.", "ask": "Which of these won Song of the Year more than once?", "answer": "Bruno Mars", "options": ["Bruno Mars", "Taylor Swift", "Beyonc\u00e9"], "reveal": "It was Bruno Mars (the other is Billie Eilish). Song of the Year rewards the writing, which is why this book tracks it closely. It's rarer than you'd think, even among the biggest names in music.", "locator": "He's in the Soul & R&B chapter.", "genres": ["Pop", "Soul / R&B"], "eras": ["modern"]}, {"kind": "the upset", "eyebrow": "Trust your gut: who do you think this book ranks higher?", "story": "Here's a head-to-head most people would call instantly. One of these is a massively famous pop star with a string of beloved hits everyone knows. The other is far less of a household name. But remember, this book ranks by who built the music, not who sold the most records, and it often lands in surprising places.", "ask": "Who does the book actually rank higher: Neil Diamond or Sting?", "answer": "Sting", "options": ["Sting", "Neil Diamond"], "reveal": "Surprise: the book places Sting well above Neil Diamond. This is the book's whole point. Fame and songwriting are different things. The official halls of fame love Neil Diamond; the book, measuring the actual writing, sees it very differently. That gap is the argument of the entire book.", "locator": "Sting is in the Pop chapter, ranked well up; Diamond sits far lower.", "genres": ["Pop"], "eras": ["golden", "rise"]}, {"kind": "the upset", "eyebrow": "One of these is a megastar. The other you might not know. Who ranks higher?", "story": "One of these is one of the best-selling rappers of all time, a true household name. The other is a hip-hop artist far fewer people could name. Most people would guess the famous one ranks higher. But this book measures something other than fame, and it keeps surprising people.", "ask": "Who does the book rank higher: Jay-Z or Lauryn Hill?", "answer": "Lauryn Hill", "options": ["Lauryn Hill", "Jay-Z"], "reveal": "The book ranks Lauryn Hill much higher. It's not a knock on Jay-Z's fame or success. It's that the book scores the songwriting itself, and on that measure Hill's work rates among the most under-recognized in the book, while Jay-Z's ranks lower than his fame would suggest. The fame and the writing come apart.", "locator": "Both are in the Hip-Hop chapter; Hill sits much higher.", "genres": ["Hip-Hop"], "eras": ["modern"]}, {"kind": "the upset", "eyebrow": "The most famous name doesn't always win here.", "story": "One of these wrote a pile of hits in the 1960s that everyone knows, a genuinely famous name. The other built an entire kind of music that the whole world later copied, but stayed in the background and is far less famous today. The book has strong opinions about which of those matters more.", "ask": "Who does the book rank higher: Neil Diamond or Thomas A. Dorsey?", "answer": "Thomas A. Dorsey", "options": ["Thomas A. Dorsey", "Neil Diamond"], "reveal": "The book ranks Thomas A. Dorsey far, far higher. Dorsey basically invented gospel music, the root of soul, R&B, and a lot of rock, yet the famous lists rank him near the bottom. Diamond is the opposite: beloved and celebrated, but the book places him further down for the writing alone, while still counting him among the greats. Dorsey holds the single biggest gap in the whole book.", "locator": "Dorsey is high in the Gospel chapter; Diamond is far down in Pop.", "genres": ["Gospel", "Pop"], "eras": ["founders", "rise"]}, {"kind": "the upset", "eyebrow": "A famous voice versus a forgotten builder. Who ranks higher?", "story": "One of these is a famous and much-loved country star. The other plugged in an electric guitar in the 1940s and basically pre-invented the sound of rock, decades early, then got mostly written out of the story. This book tries to put the builders back where they belong.", "ask": "Who does the book rank higher: Loretta Lynn or Sister Rosetta Tharpe?", "answer": "Sister Rosetta Tharpe", "options": ["Sister Rosetta Tharpe", "Loretta Lynn"], "reveal": "The book ranks Sister Rosetta Tharpe much higher. Loretta Lynn is beloved, but the book measures who built the music, and Tharpe's electric guitar pointed straight at rock and roll before it existed. She's one of the most under-credited figures in music; Lynn ranks lower here than her fame suggests.", "locator": "Tharpe is in the Gospel chapter, ranked well up; Lynn is far lower in Country.", "genres": ["Country", "Gospel"], "eras": ["founders", "rise"]}, {"kind": "settle the argument", "eyebrow": "Music fans have argued this one for sixty years.", "story": "Here is one of the oldest arguments in rock. This book can't tell you who you love more, but it measures one specific thing: who built more compositional structure. On that narrow axis, between the two songwriting halves of the Beatles, it does give an answer, by the narrowest margin in the whole book.", "ask": "On composition, who does the book rank higher: John Lennon or Paul McCartney?", "answer": "Paul McCartney", "options": ["Paul McCartney", "John Lennon"], "reveal": "It's McCartney, by a single point, and the book is careful about what that means. McCartney's edge is musical: his melody and harmony scores sit near the ceiling. Lennon's edge is lyrical: his words score higher. So the book restates what careful listeners always knew, McCartney the superior composer in the strict musical sense, Lennon the superior writer in words. Weight lyrics more heavily and Lennon wins. The margin is one point.", "locator": "See 'What the Numbers Settle' near the end of Part Two.", "genres": ["Pop"], "eras": ["rise"]}, {"kind": "settle the argument", "eyebrow": "The other forever argument. This one isn't close.", "story": "Beatles or Stones. People have fought about it since the 1960s. The book separates two different questions that usually get tangled together: which was the better band (about energy and danger, and reasonable people pick the Stones) versus who built more of the structure other writers now use. On that second question, it isn't close.", "ask": "On who built more compositional structure, who ranks higher: the Beatles or the Rolling Stones?", "answer": "The Beatles (Lennon-McCartney)", "options": ["The Beatles (Lennon-McCartney)", "The Rolling Stones (Jagger-Richards)"], "allowFamousNonCorpus": true, "reveal": "The Beatles, decisively, and the reason is the book's central idea. Lennon and McCartney carry the maximum founder score; Jagger and Richards rank well below them. It's architecture versus tenancy: the Beatles founded the structural grammar of modern pop, the studio as instrument, the album as statement. The Stones are among the greatest inhabitants of rock's architecture ever, but they lived in a house the founders built.", "locator": "See 'What the Numbers Settle' near the end of Part Two.", "genres": [], "eras": []}, {"kind": "settle the argument", "eyebrow": "Two working-class bards. The book seats them at the same table.", "story": "Bruce Springsteen and Billy Joel both built careers on songs about ordinary American life carried to arena scale. The book has a verdict on which one built more, but the more interesting finding is how close together they actually sit.", "ask": "On composition, who does the book rank higher: Bruce Springsteen or Billy Joel?", "answer": "Bruce Springsteen", "options": ["Bruce Springsteen", "Billy Joel"], "reveal": "Springsteen ranks higher, on more structural innovation and deeper lyrics. But Joel answers with the musical scores, his melodic and harmonic craft actually exceeds Springsteen's. He was the more refined pure tunesmith. And the data places them on the same map, both rare figures whose audiences came for both intimacy and scale. Joel wrote a song about a piano player who should be playing somewhere bigger. The data says he was right, and so was Springsteen, and they were playing the same room.", "locator": "See 'What the Numbers Settle' near the end of Part Two.", "genres": ["Pop", "Rock"], "eras": ["golden"]}, {"kind": "settle the argument", "eyebrow": "He matched their melodies. Did he match their architecture?", "story": "Brian Wilson of the Beach Boys and the Beatles famously pushed each other to greater heights in the 1960s, each raising the other's game. Pet Sounds and Sgt. Pepper came out of that rivalry. The book measures whether the influence was symmetric, on the one axis it tracks.", "ask": "On composition overall, who ranks higher: Brian Wilson or the Beatles?", "answer": "The Beatles (Lennon-McCartney)", "options": ["The Beatles (Lennon-McCartney)", "Brian Wilson"], "allowFamousNonCorpus": true, "reveal": "The Beatles rank higher overall, but the finding is subtler than that. Brian Wilson carries the single highest melody and harmony score in the comparison, the absolute ceiling, the data agreeing with every musician who called Pet Sounds harmonically untouchable. But his structural innovation sits below the Beatles'. Wilson perfected a musical language at the highest level; the Beatles founded one. He reached the summit; they drew the map.", "locator": "See 'What the Numbers Settle' near the end of Part Two.", "genres": ["Pop"], "eras": ["rise"]}, {"kind": "settle the argument", "eyebrow": "One writer reached the top of the book almost entirely on words.", "story": "Most writers near the top of the book have strong scores across melody, harmony, and structure. One of the top-ranked writers got there a completely different way: a perfect lyrics score paired with the most modest musical scores of anyone near the top. He proved a song can rank that high on words alone.", "ask": "Which top-ranked writer got there almost entirely on the strength of his words?", "answer": "Bob Dylan", "options": ["Bob Dylan", "Paul McCartney", "Stevie Wonder"], "reveal": "It's Bob Dylan. He pairs a perfect lyrics score with the lowest melody and harmony scores of any top-five artist, and still sits at #3 as the founder of folk songwriting. When the argument is specifically about lyrics as composition, the book doesn't hedge: Dylan proves a song can reach the very top of a composition ranking almost entirely on what the words do.", "locator": "See 'What the Numbers Settle' near the end of Part Two.", "genres": ["Folk / Americana", "Pop", "Soul / R&B"], "eras": ["rise"]}, {"kind": "settle the argument", "eyebrow": "Three titans of soul. The book ranks what they wrote, not how they performed.", "story": "Stevie Wonder, Prince, and Michael Jackson are three of the most gifted figures in popular music. The book has a verdict on which one built the most as a composer, and it's careful to say this leaves out the performance and showmanship where, especially for one of them, no one is touchable.", "ask": "On composition, which of these does the book rank highest?", "answer": "Stevie Wonder", "options": ["Stevie Wonder", "Prince", "Michael Jackson"], "reveal": "It's Stevie Wonder, by a clear margin, with near-ceiling musical scores and broad structural reach. Prince actually carries the highest structural innovation of the three, the closest to founder status. Michael Jackson scores highest on pure pop instinct and cultural impact, but lower on lyrical and structural depth. The book is honest about its blind spot: it's ranking what they wrote, not the showmanship where Jackson is untouchable. On the page, Wonder's catalog runs deepest.", "locator": "See 'What the Numbers Settle' near the end of Part Two.", "genres": ["Soul / R&B"], "eras": ["golden", "rise"]}, {"kind": "who built a genre", "eyebrow": "He has a beat named after him. That almost never happens.", "story": "Most rhythms in popular music are anonymous, the shared property of everyone who plays them. But one founding figure of rock and roll built a beat so distinctive it carries his own name to this day, a chugging, syncopated pulse you have heard in a hundred songs without knowing who to thank.", "ask": "Which rock and roll founder has a famous beat named after him?", "answer": "Bo Diddley", "options": ["Bo Diddley", "Buddy Holly", "Fats Domino"], "reveal": "It's Bo Diddley, and the rhythm is literally called the Bo Diddley beat. He was a foundational figure of rock and roll, and his signature beat, which he did not invent from nothing but made his own, runs through everything from Buddy Holly to the Rolling Stones to George Michael's Faith.", "locator": "Bo Diddley's card, in the Rock section.", "genres": ["Rock"], "eras": ["founders", "rise"]}, {"kind": "who built a genre", "eyebrow": "One artist that Chuck Berry, Little Richard, and Elvis all pointed back to.", "story": "Before rock and roll had a name, a gospel singer was already playing hard electric guitar in front of huge crowds, bending sacred music toward something nobody had heard before. The founders of rock who came after did not forget her. Chuck Berry once said his whole career was one long impersonation of her.", "ask": "Which gospel pioneer did the founders of rock point back to as a root?", "answer": "Sister Rosetta Tharpe", "options": ["Sister Rosetta Tharpe", "Mahalia Jackson", "Bessie Smith"], "reveal": "It's Sister Rosetta Tharpe, sometimes called the Godmother of Rock and Roll. The book documents her influence across three whole families of music at once, gospel, rock, and R&B. Chuck Berry, Little Richard, Elvis, and Hendrix all trace back to her electric guitar, yet most people have never heard her name.", "locator": "Sister Rosetta Tharpe's card, in the Gospel section.", "genres": ["Blues", "Gospel"], "eras": ["founders"]}, {"kind": "who built a genre", "eyebrow": "The institutions called him a forefather of three different genres at once.", "story": "It is rare for one writer to found even a single genre. The book names a writer whose own Hall of Fame citation calls him the forefather of soul, funk, and rap, all three, because the single rhythmic move he built and handed off became the ground floor of everything that followed.", "ask": "Which writer is credited as a forefather of soul, funk, AND rap?", "answer": "James Brown", "options": ["James Brown", "Sly Stone", "George Clinton"], "reveal": "It's James Brown. He ranks #30 in the book with an honestly low lyrical score, because his genius was never in the words. It was in turning the beat around and building funk on that one move, a structural contribution so large it seeded soul, funk, and hip-hop all at once.", "locator": "James Brown's card, in the Soul & R&B section.", "genres": ["Soul / R&B"], "eras": ["golden", "rise"]}];
+const GEN_ARTISTS = [{"name": "Paul McCartney", "display": "Paul McCartney", "rank": 1, "genre": "Pop", "years": "1960-present", "seg": "A", "gap": 0, "si": 25, "spotify": 16131413.0, "lastfm": 3332335.0, "craftRank": 1, "craftPct": 100, "knownFor": "Beatles, Wings", "sotyWins": 1, "inRRHOF": true, "inSHOF": true, "covers": 352, "coverConf": "HIGH", "subRank": 1, "LC": 18, "MH": 16, "HA": 13, "SI": 25}, {"name": "John Lennon", "display": "John Lennon", "rank": 2, "genre": "Pop", "years": "1960-1980", "seg": "A", "gap": 0, "si": 25, "spotify": 13907964.0, "lastfm": 4123983.0, "craftRank": 2, "craftPct": 98, "knownFor": "Beatles", "sotyWins": 1, "inRRHOF": true, "inSHOF": true, "covers": 282, "coverConf": "HIGH", "subRank": 2, "LC": 22, "MH": 14, "HA": 10, "SI": 25}, {"name": "Bob Dylan", "display": "Bob Dylan", "rank": 3, "genre": "Folk / Americana", "years": "1961-present", "seg": "A", "gap": 0, "si": 25, "spotify": 16671008.0, "lastfm": 4343530.0, "craftRank": 16, "craftPct": 87, "knownFor": "\"Like a Rolling Stone\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 404, "coverConf": "HIGH", "subRank": 1, "LC": 25, "MH": 9, "HA": 5, "SI": 25}, {"name": "Paul Simon", "display": "Paul Simon", "rank": 8, "genre": "Folk / Americana", "years": "1957-present", "seg": "I", "gap": -4, "si": 14, "spotify": 9201623.0, "lastfm": 2131389.0, "craftRank": 6, "craftPct": 95, "knownFor": "Simon & Garfunkel", "sotyWins": 1, "inRRHOF": true, "inSHOF": true, "covers": 137, "coverConf": "HIGH", "subRank": 2, "LC": 23, "MH": 14, "HA": 8, "SI": 14}, {"name": "Carole King", "display": "Carole King", "rank": 47, "genre": "Soul / R&B", "years": "1958-present", "seg": "I", "gap": -42, "si": 12, "spotify": 3828872.0, "lastfm": 1407414.0, "craftRank": 43, "craftPct": 81, "knownFor": "\"You've Got a Friend\"", "sotyWins": 1, "inRRHOF": true, "inSHOF": true, "covers": 193, "coverConf": "HIGH", "subRank": 12, "LC": 14, "MH": 14, "HA": 9, "SI": 12}, {"name": "Mick Jagger/Richards", "display": "the Rolling Stones", "rank": 21, "genre": "Rock", "years": "1962-present", "seg": "I", "gap": -15, "si": 14, "spotify": 29400000.0, "lastfm": 424472.0, "craftRank": 16, "craftPct": 87, "knownFor": "Rolling Stones", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 212, "coverConf": "HIGH", "subRank": 7, "LC": 17, "MH": 14, "HA": 9, "SI": 14}, {"name": "Stevie Wonder", "display": "Stevie Wonder", "rank": 9, "genre": "Soul / R&B", "years": "1961-present", "seg": "I", "gap": -2, "si": 14, "spotify": 21584701.0, "lastfm": 4019239.0, "craftRank": 9, "craftPct": 92, "knownFor": "\"Superstition\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 188, "coverConf": "HIGH", "subRank": 2, "LC": 16, "MH": 16, "HA": 12, "SI": 14}, {"name": "Smokey Robinson", "display": "Smokey Robinson", "rank": 43, "genre": "Soul / R&B", "years": "1957-present", "seg": "I", "gap": -35, "si": 14, "spotify": 1351174.0, "lastfm": 516596.0, "craftRank": 58, "craftPct": 79, "knownFor": "The Miracles", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 125, "coverConf": "HIGH", "subRank": 11, "LC": 16, "MH": 14, "HA": 9, "SI": 14}, {"name": "Chuck Berry", "display": "Chuck Berry", "rank": 5, "genre": "Rock", "years": "1955-2017", "seg": "A", "gap": 4, "si": 25, "spotify": 6607906.0, "lastfm": 2633929.0, "craftRank": 57, "craftPct": 79, "knownFor": "\"Johnny B. Goode\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 74, "coverConf": "HIGH", "subRank": 1, "LC": 18, "MH": 12, "HA": 9, "SI": 25}, {"name": "Brian Wilson", "display": "Brian Wilson", "rank": 14, "genre": "Pop", "years": "1962-2025", "seg": "I", "gap": -4, "si": 14, "spotify": 106004.0, "lastfm": 370455.0, "craftRank": 12, "craftPct": 90, "knownFor": "Beach Boys", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 0, "coverConf": "HIGH", "subRank": 5, "LC": 16, "MH": 17, "HA": 10, "SI": 14}, {"name": "Bruce Springsteen", "display": "Bruce Springsteen", "rank": 26, "genre": "Rock", "years": "1972-present", "seg": "I", "gap": -15, "si": 14, "spotify": 20400000.0, "lastfm": 3609090.0, "craftRank": 21, "craftPct": 86, "knownFor": "\"Born to Run\"", "sotyWins": 1, "inRRHOF": true, "inSHOF": true, "covers": 205, "coverConf": "HIGH", "subRank": 8, "LC": 19, "MH": 11, "HA": 9, "SI": 14}, {"name": "Bob Marley", "display": "Bob Marley", "rank": 5, "genre": "Reggae", "years": "1962-1981", "seg": "I", "gap": 7, "si": 17, "spotify": 28452036.0, "lastfm": 2270711.0, "craftRank": 9, "craftPct": 92, "knownFor": "The Wailers", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 90, "coverConf": "HIGH", "subRank": 1, "LC": 20, "MH": 12, "HA": 13, "SI": 17}, {"name": "Hank Williams", "display": "Hank Williams", "rank": 4, "genre": "Country", "years": "1946-1953", "seg": "A", "gap": 9, "si": 25, "spotify": 1500000.0, "lastfm": 943432.0, "craftRank": 32, "craftPct": 83, "knownFor": "\"Your Cheatin' Heart\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 0, "coverConf": "", "subRank": 1, "LC": 20, "MH": 11, "HA": 8, "SI": 25}, {"name": "Joni Mitchell", "display": "Joni Mitchell", "rank": 12, "genre": "Folk / Americana", "years": "1964-2023", "seg": "I", "gap": 2, "si": 11, "spotify": 2700000.0, "lastfm": 1748589.0, "craftRank": 5, "craftPct": 97, "knownFor": "\"Big Yellow Taxi\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 137, "coverConf": "HIGH", "subRank": 3, "LC": 25, "MH": 17, "HA": 7, "SI": 11}, {"name": "Leonard Cohen", "display": "Leonard Cohen", "rank": 37, "genre": "Folk / Americana", "years": "1967-2016", "seg": "I", "gap": -22, "si": 11, "spotify": 3583748.0, "lastfm": 2147725.0, "craftRank": 21, "craftPct": 86, "knownFor": "\"Hallelujah\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 0, "coverConf": "HIGH", "subRank": 5, "LC": 25, "MH": 10, "HA": 4, "SI": 11}, {"name": "James Brown", "display": "James Brown", "rank": 30, "genre": "Soul / R&B", "years": "1956-2006", "seg": "A", "gap": -14, "si": 25, "spotify": 5028978.0, "lastfm": 2426906.0, "craftRank": 140, "craftPct": 63, "knownFor": "\"I Got You (I Feel Good)\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 35, "coverConf": "LOW", "subRank": 8, "LC": 7, "MH": 14, "HA": 7, "SI": 25}, {"name": "Neil Young", "display": "Neil Young", "rank": 9, "genre": "Country", "years": "1966-present", "seg": "I", "gap": 8, "si": 19, "spotify": 11800000.0, "lastfm": 2778143.0, "craftRank": 21, "craftPct": 86, "knownFor": "\"Heart of Gold\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 241, "coverConf": "HIGH", "subRank": 2, "LC": 20, "MH": 12, "HA": 7, "SI": 19}, {"name": "Holland/Dozier/Holland", "display": "Holland-Dozier-Holland", "rank": 86, "genre": "Soul / R&B", "years": "1962-1968", "seg": "I", "gap": -68, "si": 11, "spotify": 0, "lastfm": 67709.0, "craftRank": 74, "craftPct": 76, "knownFor": "wrote the Supremes' and Four Tops' biggest hits", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 138, "coverConf": "MED-HIGH", "subRank": 34, "LC": 14, "MH": 14, "HA": 9, "SI": 11}, {"name": "Burt Bacharach", "display": "Burt Bacharach", "rank": 54, "genre": "Soul / R&B", "years": "1952-2023", "seg": "I", "gap": -35, "si": 12, "spotify": 0, "lastfm": 300591.0, "craftRank": 50, "craftPct": 79, "knownFor": "\"Raindrops Keep Fallin' on My Head\"", "sotyWins": 1, "inRRHOF": true, "inSHOF": true, "covers": 227, "coverConf": "HIGH", "subRank": 15, "LC": 9, "MH": 17, "HA": 9, "SI": 12}, {"name": "Prince", "display": "Prince", "rank": 15, "genre": "Soul / R&B", "years": "1978-2016", "seg": "I", "gap": 5, "si": 17, "spotify": 22131305.0, "lastfm": 3469287.0, "craftRank": 27, "craftPct": 84, "knownFor": "\"Purple Rain\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 142, "coverConf": "HIGH", "subRank": 3, "LC": 15, "MH": 15, "HA": 9, "SI": 17}, {"name": "Michael Jackson", "display": "Michael Jackson", "rank": 30, "genre": "Soul / R&B", "years": "1971-2009", "seg": "I", "gap": -9, "si": 14, "spotify": 111076797.0, "lastfm": 7063259.0, "craftRank": 32, "craftPct": 83, "knownFor": "Jackson 5, \"Thriller\"", "sotyWins": 1, "inRRHOF": true, "inSHOF": true, "covers": 64, "coverConf": "HIGH", "subRank": 7, "LC": 11, "MH": 14, "HA": 13, "SI": 14}, {"name": "Leiber/Stoller", "display": "Leiber and Stoller", "rank": 70, "genre": "Soul / R&B", "years": "1950-2011", "seg": "I", "gap": -48, "si": 14, "spotify": 0, "lastfm": 111.0, "craftRank": 78, "craftPct": 75, "knownFor": "wrote \"Hound Dog,\" \"Stand By Me,\" and \"Jailhouse Rock\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 148, "coverConf": "MED-HIGH", "subRank": 27, "LC": 13, "MH": 12, "HA": 8, "SI": 14}, {"name": "Ellie Greenwich", "display": "Ellie Greenwich", "rank": 127, "genre": "Soul / R&B", "years": "1960-2009", "seg": "I", "gap": -104, "si": 11, "spotify": 0, "lastfm": 14796.0, "craftRank": 115, "craftPct": 68, "knownFor": "co-wrote \"Be My Baby\" and \"Da Doo Ron Ron\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 45, "coverConf": "MED", "subRank": 40, "LC": 14, "MH": 9, "HA": 10, "SI": 11}, {"name": "Buddy Holly", "display": "Buddy Holly", "rank": 21, "genre": "Rock", "years": "1956-1959", "seg": "I", "gap": 3, "si": 17, "spotify": 1500000.0, "lastfm": 1359014.0, "craftRank": 42, "craftPct": 81, "knownFor": "The Crickets", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 0, "coverConf": "", "subRank": 5, "LC": 14, "MH": 14, "HA": 10, "SI": 17}, {"name": "Lou Reed", "display": "Lou Reed", "rank": 104, "genre": "Pop", "years": "1965-2013", "seg": "I", "gap": -79, "si": 14, "spotify": 3784625.0, "lastfm": 2347067.0, "craftRank": 115, "craftPct": 68, "knownFor": "The Velvet Underground", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 184, "coverConf": "HIGH", "subRank": 19, "LC": 20, "MH": 9, "HA": 3, "SI": 14}, {"name": "Woody Guthrie", "display": "Woody Guthrie", "rank": 15, "genre": "Folk / Americana", "years": "1935-1967", "seg": "A", "gap": 11, "si": 25, "spotify": 277700.0, "lastfm": 564352.0, "craftRank": 96, "craftPct": 71, "knownFor": "\"This Land Is Your Land\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 0, "coverConf": "", "subRank": 4, "LC": 19, "MH": 8, "HA": 5, "SI": 25}, {"name": "Dolly Parton", "display": "Dolly Parton", "rank": 43, "genre": "Country", "years": "1964-present", "seg": "I", "gap": -16, "si": 12, "spotify": 16000000.0, "lastfm": 2307180.0, "craftRank": 27, "craftPct": 84, "knownFor": "\"Jolene\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 146, "coverConf": "MED-HIGH", "subRank": 5, "LC": 17, "MH": 12, "HA": 10, "SI": 12}, {"name": "Van Morrison", "display": "Van Morrison", "rank": 54, "genre": "Soul / R&B", "years": "1964-present", "seg": "I", "gap": -26, "si": 11, "spotify": 9600000.0, "lastfm": 2677853.0, "craftRank": 47, "craftPct": 81, "knownFor": "\"Brown Eyed Girl\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 126, "coverConf": "HIGH", "subRank": 21, "LC": 20, "MH": 13, "HA": 7, "SI": 11}, {"name": "David Bowie", "display": "David Bowie", "rank": 12, "genre": "Rock", "years": "1964-2016", "seg": "I", "gap": 17, "si": 14, "spotify": 21255318.0, "lastfm": 5661155.0, "craftRank": 9, "craftPct": 92, "knownFor": "\"Space Oddity\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 254, "coverConf": "HIGH", "subRank": 3, "LC": 20, "MH": 15, "HA": 8, "SI": 14}, {"name": "Elvis Costello", "display": "Elvis Costello", "rank": 54, "genre": "Pop", "years": "1977-present", "seg": "I", "gap": -24, "si": 12, "spotify": 1608661.0, "lastfm": 1336291.0, "craftRank": 43, "craftPct": 81, "knownFor": "\"Alison\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 35, "coverConf": "LOW", "subRank": 9, "LC": 20, "MH": 13, "HA": 7, "SI": 12}, {"name": "Pete Townshend", "display": "Pete Townshend", "rank": 21, "genre": "Rock", "years": "1964-present", "seg": "I", "gap": 10, "si": 14, "spotify": 644200.0, "lastfm": 358525.0, "craftRank": 21, "craftPct": 86, "knownFor": "The Who", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 60, "coverConf": "MED", "subRank": 6, "LC": 18, "MH": 14, "HA": 9, "SI": 14}, {"name": "Sly Stone", "display": "Sly Stone", "rank": 54, "genre": "Soul / R&B", "years": "1967-2023", "seg": "I", "gap": -22, "si": 17, "spotify": 2018206.0, "lastfm": 68167.0, "craftRank": 99, "craftPct": 71, "knownFor": "Sly and the Family Stone", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 30, "coverConf": "LOW", "subRank": 14, "LC": 14, "MH": 12, "HA": 9, "SI": 17}, {"name": "Johnny Cash", "display": "Johnny Cash", "rank": 47, "genre": "Country", "years": "1955-2003", "seg": "I", "gap": -14, "si": 14, "spotify": 12600000.0, "lastfm": 4141126.0, "craftRank": 50, "craftPct": 79, "knownFor": "\"Ring of Fire\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 133, "coverConf": "MED-HIGH", "subRank": 6, "LC": 18, "MH": 10, "HA": 8, "SI": 14}, {"name": "John Fogerty", "display": "John Fogerty", "rank": 70, "genre": "Soul / R&B", "years": "1964-present", "seg": "I", "gap": -36, "si": 12, "spotify": 32192415.0, "lastfm": 471987.0, "craftRank": 62, "craftPct": 78, "knownFor": "Creedence Clearwater Revival", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 73, "coverConf": "HIGH", "subRank": 20, "LC": 13, "MH": 14, "HA": 9, "SI": 12}, {"name": "Jackson Browne", "display": "Jackson Browne", "rank": 111, "genre": "Rock", "years": "1967-present", "seg": "I", "gap": -76, "si": 12, "spotify": 4132226.0, "lastfm": 1070705.0, "craftRank": 105, "craftPct": 70, "knownFor": "\"Running on Empty\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 25, "coverConf": "LOW", "subRank": 16, "LC": 17, "MH": 11, "HA": 7, "SI": 12}, {"name": "Neil Diamond", "display": "Neil Diamond", "rank": 139, "genre": "Pop", "years": "1962-2012", "seg": "C", "gap": -103, "si": 9, "spotify": 8692583.0, "lastfm": 1606062.0, "craftRank": 114, "craftPct": 68, "knownFor": "\"Sweet Caroline\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 55, "coverConf": "MED", "subRank": 22, "LC": 13, "MH": 9, "HA": 10, "SI": 9}, {"name": "Billy Joel", "display": "Billy Joel", "rank": 70, "genre": "Pop", "years": "1971-present", "seg": "C", "gap": -33, "si": 9, "spotify": 35623449.0, "lastfm": 4123579.0, "craftRank": 36, "craftPct": 83, "knownFor": "\"Piano Man\"", "sotyWins": 1, "inRRHOF": true, "inSHOF": true, "covers": 82, "coverConf": "HIGH", "subRank": 11, "LC": 15, "MH": 14, "HA": 10, "SI": 9}, {"name": "Elton John/Taupin", "display": "Elton John", "rank": 15, "genre": "Pop", "years": "1967-present", "seg": "I", "gap": 23, "si": 14, "spotify": 51946250.0, "lastfm": 5303047.0, "craftRank": 12, "craftPct": 90, "knownFor": "\"Rocket Man\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 170, "coverConf": "MED", "subRank": 4, "LC": 18, "MH": 15, "HA": 10, "SI": 14}, {"name": "Robbie Robertson", "display": "Robbie Robertson", "rank": 94, "genre": "Folk / Americana", "years": "1965-2023", "seg": "I", "gap": -55, "si": 14, "spotify": 199803.0, "lastfm": 153566.0, "craftRank": 105, "craftPct": 70, "knownFor": "The Band", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 20, "coverConf": "LOW", "subRank": 8, "LC": 17, "MH": 11, "HA": 7, "SI": 14}, {"name": "George Clinton", "display": "George Clinton", "rank": 94, "genre": "Soul / R&B", "years": "1956-present", "seg": "I", "gap": -54, "si": 17, "spotify": 662000.0, "lastfm": 311224.0, "craftRank": 142, "craftPct": 63, "knownFor": "Parliament-Funkadelic", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 15, "coverConf": "LOW", "subRank": 29, "LC": 12, "MH": 11, "HA": 8, "SI": 17}, {"name": "Willie Dixon", "display": "Willie Dixon", "rank": 104, "genre": "Blues", "years": "1940-1992", "seg": "S", "gap": -63, "si": 16, "spotify": 99715.0, "lastfm": 205319.0, "craftRank": 129, "craftPct": 65, "knownFor": "wrote the blues songs Led Zeppelin and the Stones made famous", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 55, "coverConf": "MED", "subRank": 4, "LC": 14, "MH": 10, "HA": 5, "SI": 16}, {"name": "Don Henley/Eagles", "display": "the Eagles", "rank": 37, "genre": "Country", "years": "1971-present", "seg": "I", "gap": 5, "si": 14, "spotify": 27377678.0, "lastfm": 1189754.0, "craftRank": 43, "craftPct": 81, "knownFor": "Eagles", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 70, "coverConf": "MED", "subRank": 3, "LC": 17, "MH": 12, "HA": 10, "SI": 14}, {"name": "Willie Nelson", "display": "Willie Nelson", "rank": 70, "genre": "Country", "years": "1956-present", "seg": "I", "gap": -27, "si": 12, "spotify": 6700000.0, "lastfm": 1614735.0, "craftRank": 62, "craftPct": 78, "knownFor": "\"On the Road Again\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 122, "coverConf": "HIGH", "subRank": 8, "LC": 16, "MH": 12, "HA": 7, "SI": 12}, {"name": "Stevie Nicks", "display": "Stevie Nicks", "rank": 86, "genre": "Rock", "years": "1968-present", "seg": "C", "gap": -42, "si": 9, "spotify": 9244452.0, "lastfm": 1582479.0, "craftRank": 65, "craftPct": 78, "knownFor": "Fleetwood Mac", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 20, "coverConf": "LOW", "subRank": 13, "LC": 18, "MH": 11, "HA": 9, "SI": 9}, {"name": "Tom Petty", "display": "Tom Petty", "rank": 66, "genre": "Pop", "years": "1971-2017", "seg": "C", "gap": -21, "si": 9, "spotify": 12100000.0, "lastfm": 1940375.0, "craftRank": 27, "craftPct": 84, "knownFor": "the Heartbreakers", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 0, "coverConf": "MED", "subRank": 12, "LC": 15, "MH": 14, "HA": 10, "SI": 9}, {"name": "Harry Nilsson", "display": "Harry Nilsson", "rank": 81, "genre": "Pop", "years": "1966-1994", "seg": "C", "gap": -35, "si": 9, "spotify": 2928717.0, "lastfm": 1218928.0, "craftRank": 47, "craftPct": 81, "knownFor": "\"Without You\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 32, "coverConf": "MED", "subRank": 14, "LC": 18, "MH": 14, "HA": 10, "SI": 9}, {"name": "Curtis Mayfield", "display": "Curtis Mayfield", "rank": 21, "genre": "Soul / R&B", "years": "1958-1999", "seg": "I", "gap": 26, "si": 14, "spotify": 3395261.0, "lastfm": 1474654.0, "craftRank": 21, "craftPct": 86, "knownFor": "The Impressions, \"Superfly\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 52, "coverConf": "MED", "subRank": 5, "LC": 20, "MH": 13, "HA": 8, "SI": 14}, {"name": "Isaac Hayes", "display": "Isaac Hayes", "rank": 94, "genre": "Soul / R&B", "years": "1962-2008", "seg": "I", "gap": -46, "si": 14, "spotify": 795100.0, "lastfm": 989158.0, "craftRank": 112, "craftPct": 68, "knownFor": "\"Theme from Shaft\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 20, "coverConf": "LOW", "subRank": 31, "LC": 10, "MH": 15, "HA": 7, "SI": 14}, {"name": "Jay-Z", "display": "Jay-Z", "rank": 127, "genre": "Hip-Hop", "years": "1996-present", "seg": "I", "gap": -78, "si": 14, "spotify": 45408298.0, "lastfm": 5539187.0, "craftRank": 142, "craftPct": 63, "knownFor": "\"Empire State of Mind\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 2, "coverConf": "LOW", "subRank": 7, "LC": 19, "MH": 7, "HA": 5, "SI": 14}, {"name": "Loretta Lynn", "display": "Loretta Lynn", "rank": 139, "genre": "Country", "years": "1960-2022", "seg": "C", "gap": -89, "si": 9, "spotify": 1500000.0, "lastfm": 456779.0, "craftRank": 112, "craftPct": 68, "knownFor": "\"Coal Miner's Daughter\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 25, "coverConf": "LOW", "subRank": 13, "LC": 15, "MH": 10, "HA": 7, "SI": 9}, {"name": "Gamble/Huff", "display": "Gamble and Huff", "rank": 94, "genre": "Soul / R&B", "years": "1964-1996", "seg": "I", "gap": -43, "si": 14, "spotify": 0, "lastfm": 3955.0, "craftRank": 105, "craftPct": 70, "knownFor": "wrote \"Love Train\" and the sound of 1970s Philly soul", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 65, "coverConf": "MED", "subRank": 35, "LC": 13, "MH": 13, "HA": 8, "SI": 14}, {"name": "Marvin Gaye", "display": "Marvin Gaye", "rank": 26, "genre": "Soul / R&B", "years": "1961-1984", "seg": "I", "gap": 26, "si": 14, "spotify": 24085656.0, "lastfm": 3858466.0, "craftRank": 27, "craftPct": 84, "knownFor": "\"What's Going On\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 65, "coverConf": "MED", "subRank": 6, "LC": 18, "MH": 14, "HA": 8, "SI": 14}, {"name": "Randy Newman", "display": "Randy Newman", "rank": 94, "genre": "Pop", "years": "1968-present", "seg": "I", "gap": -41, "si": 12, "spotify": 4000000.0, "lastfm": 1066655.0, "craftRank": 80, "craftPct": 75, "knownFor": "\"Short People,\" Pixar scores", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 133, "coverConf": "HIGH", "subRank": 20, "LC": 19, "MH": 12, "HA": 4, "SI": 12}, {"name": "Robert Johnson", "display": "Robert Johnson", "rank": 19, "genre": "Blues", "years": "1936-1938", "seg": "A", "gap": 35, "si": 25, "spotify": 248400.0, "lastfm": 728540.0, "craftRank": 96, "craftPct": 71, "knownFor": "\"Cross Road Blues\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 0, "coverConf": "", "subRank": 1, "LC": 16, "MH": 11, "HA": 5, "SI": 25}, {"name": "James Taylor", "display": "James Taylor", "rank": 86, "genre": "Soul / R&B", "years": "1968-present", "seg": "I", "gap": -31, "si": 12, "spotify": 5685898.0, "lastfm": 1502583.0, "craftRank": 79, "craftPct": 75, "knownFor": "\"Fire and Rain\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 35, "coverConf": "LOW", "subRank": 26, "LC": 14, "MH": 14, "HA": 8, "SI": 12}, {"name": "Steely Dan", "display": "Steely Dan", "rank": 21, "genre": "Pop", "years": "1972-2017", "seg": "I", "gap": 35, "si": 14, "spotify": 8500000.0, "lastfm": 1818519.0, "craftRank": 18, "craftPct": 87, "knownFor": "\"Reelin' in the Years\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 25, "coverConf": "MED", "subRank": 3, "LC": 22, "MH": 16, "HA": 8, "SI": 14}, {"name": "Sam Cooke", "display": "Sam Cooke", "rank": 54, "genre": "Soul / R&B", "years": "1951-1964", "seg": "I", "gap": 3, "si": 14, "spotify": 6600000.0, "lastfm": 1909491.0, "craftRank": 68, "craftPct": 76, "knownFor": "\"A Change Is Gonna Come\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 53, "coverConf": "HIGH", "subRank": 17, "LC": 14, "MH": 12, "HA": 9, "SI": 14}, {"name": "Allen Toussaint", "display": "Allen Toussaint", "rank": 70, "genre": "Soul / R&B", "years": "1958-2015", "seg": "I", "gap": -12, "si": 14, "spotify": 453493.0, "lastfm": 268858.0, "craftRank": 82, "craftPct": 75, "knownFor": "wrote \"Lady Marmalade\" and \"Working in a Coal Mine\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 40, "coverConf": "MED", "subRank": 23, "LC": 15, "MH": 13, "HA": 9, "SI": 14}, {"name": "Merle Haggard", "display": "Merle Haggard", "rank": 127, "genre": "Country", "years": "1963-2016", "seg": "C", "gap": -68, "si": 9, "spotify": 2264148.0, "lastfm": 561096.0, "craftRank": 100, "craftPct": 71, "knownFor": "\"Okie from Muskogee\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 149, "coverConf": "HIGH", "subRank": 14, "LC": 16, "MH": 11, "HA": 7, "SI": 9}, {"name": "Bee Gees/Barry Gibb", "display": "the Bee Gees", "rank": 19, "genre": "Soul / R&B", "years": "1963-2012", "seg": "I", "gap": 41, "si": 14, "spotify": 30306639.0, "lastfm": 3506384.0, "craftRank": 14, "craftPct": 89, "knownFor": "Bee Gees", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 182, "coverConf": "MED", "subRank": 4, "LC": 14, "MH": 16, "HA": 12, "SI": 14}, {"name": "Al Green", "display": "Al Green", "rank": 81, "genre": "Soul / R&B", "years": "1967-present", "seg": "I", "gap": -20, "si": 12, "spotify": 7159121.0, "lastfm": 2310371.0, "craftRank": 71, "craftPct": 76, "knownFor": "\"Let's Stay Together\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 15, "coverConf": "LOW", "subRank": 25, "LC": 14, "MH": 14, "HA": 9, "SI": 12}, {"name": "Ashford and Simpson", "display": "Ashford and Simpson", "rank": 119, "genre": "Soul / R&B", "years": "1964-2011", "seg": "I", "gap": -57, "si": 11, "spotify": 418300.0, "lastfm": 187966.0, "craftRank": 105, "craftPct": 70, "knownFor": "wrote \"Ain't No Mountain High Enough\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 40, "coverConf": "MED", "subRank": 38, "LC": 15, "MH": 10, "HA": 9, "SI": 11}, {"name": "Jimmy Webb", "display": "Jimmy Webb", "rank": 37, "genre": "Country", "years": "1965-present", "seg": "I", "gap": 26, "si": 12, "spotify": 66401.0, "lastfm": 41409.0, "craftRank": 26, "craftPct": 86, "knownFor": "wrote \"Wichita Lineman\" and \"MacArthur Park\"", "sotyWins": 1, "inRRHOF": false, "inSHOF": true, "covers": 85, "coverConf": "MED", "subRank": 4, "LC": 18, "MH": 17, "HA": 7, "SI": 12}, {"name": "Jimi Hendrix", "display": "Jimi Hendrix", "rank": 26, "genre": "Rock", "years": "1966-present", "seg": "A", "gap": 38, "si": 17, "spotify": 5886810.0, "lastfm": 4079226.0, "craftRank": 50, "craftPct": 79, "knownFor": "\"Purple Haze\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 35, "coverConf": "LOW", "subRank": 4, "LC": 13, "MH": 16, "HA": 8, "SI": 17}, {"name": "George Harrison", "display": "George Harrison", "rank": 47, "genre": "Pop", "years": "1960-2001", "seg": "I", "gap": 17, "si": 11, "spotify": 9723843.0, "lastfm": 2510080.0, "craftRank": 31, "craftPct": 84, "knownFor": "Beatles", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 118, "coverConf": "MED-HIGH", "subRank": 8, "LC": 17, "MH": 14, "HA": 9, "SI": 11}, {"name": "Max Martin", "display": "Max Martin", "rank": 139, "genre": "Pop", "years": "1994-present", "seg": "C", "gap": -73, "si": 9, "spotify": 0, "lastfm": 3883.0, "craftRank": 115, "craftPct": 68, "knownFor": "wrote chart-topping hits for Britney, Katy Perry, and the Weeknd", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 238, "coverConf": "HIGH", "subRank": 25, "LC": 10, "MH": 9, "HA": 12, "SI": 9}, {"name": "Otis Redding", "display": "Otis Redding", "rank": 43, "genre": "Soul / R&B", "years": "1941-1967", "seg": "I", "gap": 24, "si": 14, "spotify": 10124985.0, "lastfm": 2441985.0, "craftRank": 50, "craftPct": 79, "knownFor": "\"(Sittin' On) The Dock of the Bay\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 30, "coverConf": "LOW", "subRank": 9, "LC": 16, "MH": 12, "HA": 10, "SI": 14}, {"name": "Fats Domino", "display": "Fats Domino", "rank": 86, "genre": "Rock", "years": "1949-2007", "seg": "S", "gap": -19, "si": 19, "spotify": 1000000.0, "lastfm": 732610.0, "craftRank": 152, "craftPct": 62, "knownFor": "\"Blueberry Hill\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 40, "coverConf": "MED", "subRank": 15, "LC": 11, "MH": 9, "HA": 9, "SI": 19}, {"name": "Fats Waller", "display": "Fats Waller", "rank": 111, "genre": "Jazz", "years": "1922-1943", "seg": "S", "gap": -42, "si": 14, "spotify": 0, "lastfm": 412803.0, "craftRank": 124, "craftPct": 67, "knownFor": "\"Ain't Misbehavin'\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 0, "coverConf": "", "subRank": 1, "LC": 13, "MH": 14, "HA": 5, "SI": 14}, {"name": "Norman Whitfield", "display": "Norman Whitfield", "rank": 81, "genre": "Soul / R&B", "years": "1966-1995", "seg": "I", "gap": -11, "si": 14, "spotify": 0, "lastfm": 1342.0, "craftRank": 89, "craftPct": 73, "knownFor": "wrote \"I Heard It Through the Grapevine\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 35, "coverConf": "LOW", "subRank": 24, "LC": 16, "MH": 12, "HA": 8, "SI": 14}, {"name": "Ray Charles", "display": "Ray Charles", "rank": 7, "genre": "Soul / R&B", "years": "1948-2004", "seg": "A", "gap": 64, "si": 25, "spotify": 10340211.0, "lastfm": 2874584.0, "craftRank": 50, "craftPct": 79, "knownFor": "\"Georgia on My Mind\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 55, "coverConf": "MED", "subRank": 1, "LC": 14, "MH": 14, "HA": 9, "SI": 25}, {"name": "Queen", "display": "Queen", "rank": 9, "genre": "Rock", "years": "1970-present", "seg": "I", "gap": 62, "si": 14, "spotify": 54114022.0, "lastfm": 7264829.0, "craftRank": 7, "craftPct": 94, "knownFor": "\"Bohemian Rhapsody\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 30, "coverConf": "LOW", "subRank": 2, "LC": 16, "MH": 17, "HA": 13, "SI": 14}, {"name": "Nile Rodgers", "display": "Nile Rodgers", "rank": 47, "genre": "Soul / R&B", "years": "1977-present", "seg": "I", "gap": 24, "si": 14, "spotify": 18149970.0, "lastfm": 130542.0, "craftRank": 62, "craftPct": 78, "knownFor": "Chic, \"Le Freak\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 28, "coverConf": "MED", "subRank": 10, "LC": 12, "MH": 15, "HA": 10, "SI": 14}, {"name": "Roy Orbison", "display": "Roy Orbison", "rank": 86, "genre": "Pop", "years": "1956-1988", "seg": "C", "gap": -15, "si": 9, "spotify": 7500000.0, "lastfm": 2054312.0, "craftRank": 65, "craftPct": 78, "knownFor": "\"Oh, Pretty Woman\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 45, "coverConf": "MED", "subRank": 16, "LC": 13, "MH": 15, "HA": 9, "SI": 9}, {"name": "Jimmie Rodgers", "display": "Jimmie Rodgers", "rank": 111, "genre": "Country", "years": "1927-1933", "seg": "S", "gap": -40, "si": 16, "spotify": 0, "lastfm": 243608.0, "craftRank": 146, "craftPct": 63, "knownFor": "the first country star, \"the Singing Brakeman\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 0, "coverConf": "", "subRank": 11, "LC": 13, "MH": 11, "HA": 7, "SI": 16}, {"name": "Pete Seeger", "display": "Pete Seeger", "rank": 160, "genre": "Folk / Americana", "years": "1940-2014", "seg": "S", "gap": -89, "si": 11, "spotify": 262235.0, "lastfm": 321726.0, "craftRank": 159, "craftPct": 59, "knownFor": "\"If I Had a Hammer\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 41, "coverConf": "MED-HIGH", "subRank": 19, "LC": 14, "MH": 8, "HA": 5, "SI": 11}, {"name": "George and Ira Gershwin", "display": "George and Ira Gershwin", "rank": 15, "genre": "Songbook", "years": "1924-1937", "seg": "S", "gap": 62, "si": 11, "spotify": 0, "lastfm": 1281.0, "craftRank": 8, "craftPct": 94, "knownFor": "\"Summertime\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 0, "coverConf": "", "subRank": 1, "LC": 22, "MH": 17, "HA": 8, "SI": 11}, {"name": "Doc Pomus", "display": "Doc Pomus", "rank": 151, "genre": "Soul / R&B", "years": "1947-1991", "seg": "S", "gap": -73, "si": 9, "spotify": 0, "lastfm": 4710.0, "craftRank": 125, "craftPct": 67, "knownFor": "wrote \"Save the Last Dance for Me\" and \"This Magic Moment\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 145, "coverConf": "MED-HIGH", "subRank": 44, "LC": 13, "MH": 12, "HA": 7, "SI": 9}, {"name": "Billy Strayhorn", "display": "Billy Strayhorn", "rank": 111, "genre": "Jazz", "years": "1938-1967", "seg": "S", "gap": -32, "si": 8, "spotify": 0, "lastfm": 54941.0, "craftRank": 68, "craftPct": 76, "knownFor": "wrote Duke Ellington's \"Take the 'A' Train\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 42, "coverConf": "MED", "subRank": 3, "LC": 13, "MH": 17, "HA": 5, "SI": 8}, {"name": "Bill Withers", "display": "Bill Withers", "rank": 94, "genre": "Soul / R&B", "years": "1971-1985", "seg": "I", "gap": -14, "si": 12, "spotify": 21295273.0, "lastfm": 2752441.0, "craftRank": 87, "craftPct": 73, "knownFor": "\"Ain't No Sunshine\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 49, "coverConf": "HIGH", "subRank": 33, "LC": 15, "MH": 9, "HA": 9, "SI": 12}, {"name": "Jimmy Jam/Terry Lewis", "display": "Jimmy Jam and Terry Lewis", "rank": 94, "genre": "Soul / R&B", "years": "1982-present", "seg": "I", "gap": -14, "si": 14, "spotify": 38000.0, "lastfm": 364.0, "craftRank": 105, "craftPct": 70, "knownFor": "produced Janet Jackson's biggest hits", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 10, "coverConf": "LOW", "subRank": 30, "LC": 13, "MH": 13, "HA": 9, "SI": 14}, {"name": "Laura Nyro", "display": "Laura Nyro", "rank": 127, "genre": "Soul / R&B", "years": "1966-1994", "seg": "I", "gap": -47, "si": 14, "spotify": 63883.0, "lastfm": 200651.0, "craftRank": 138, "craftPct": 65, "knownFor": "wrote \"And When I Die\" and \"Wedding Bell Blues\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": true, "covers": 15, "coverConf": "LOW", "subRank": 41, "LC": 15, "MH": 14, "HA": 7, "SI": 14}, {"name": "Taylor Swift", "display": "Taylor Swift", "rank": 70, "genre": "Pop", "years": "2006-present", "seg": "V", "gap": 13, "si": 12, "spotify": 101168766.0, "lastfm": 5948967.0, "craftRank": 67, "craftPct": 78, "knownFor": "\"Shake It Off\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 205, "coverConf": "HIGH", "subRank": 13, "LC": 17, "MH": 12, "HA": 10, "SI": 12}, {"name": "Kurt Cobain", "display": "Kurt Cobain", "rank": 119, "genre": "Rock", "years": "1987-1994", "seg": "I", "gap": -36, "si": 11, "spotify": 38756109.0, "lastfm": 7566124.0, "craftRank": 105, "craftPct": 70, "knownFor": "Nirvana", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 30, "coverConf": "LOW", "subRank": 17, "LC": 15, "MH": 11, "HA": 9, "SI": 11}, {"name": "Notorious B.I.G.", "display": "Notorious B.I.G.", "rank": 149, "genre": "Hip-Hop", "years": "1993-1997", "seg": "I", "gap": -64, "si": 11, "spotify": 27275233.0, "lastfm": 3180006.0, "craftRank": 142, "craftPct": 63, "knownFor": "\"Juicy\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 1, "coverConf": "LOW", "subRank": 13, "LC": 21, "MH": 5, "HA": 5, "SI": 11}, {"name": "Kris Kristofferson", "display": "Kris Kristofferson", "rank": 70, "genre": "Country", "years": "1970-present", "seg": "C", "gap": 16, "si": 9, "spotify": 3407152.0, "lastfm": 461365.0, "craftRank": 32, "craftPct": 83, "knownFor": "wrote \"Me and Bobby McGee\" and \"Help Me Make It Through the Night\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 111, "coverConf": "HIGH", "subRank": 7, "LC": 23, "MH": 10, "HA": 5, "SI": 9}, {"name": "Morrissey/Marr", "display": "the Smiths", "rank": 66, "genre": "Rock", "years": "1982-1987", "seg": "I", "gap": 21, "si": 11, "spotify": 23300000.0, "lastfm": 1863736.0, "craftRank": 46, "craftPct": 81, "knownFor": "The Smiths", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 20, "coverConf": "LOW", "subRank": 12, "LC": 20, "MH": 14, "HA": 7, "SI": 11}, {"name": "Radiohead/Yorke", "display": "Radiohead", "rank": 54, "genre": "Rock", "years": "1991-present", "seg": "I", "gap": 34, "si": 14, "spotify": 44612898.0, "lastfm": 8324770.0, "craftRank": 77, "craftPct": 76, "knownFor": "Radiohead", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 138, "coverConf": "HIGH", "subRank": 11, "LC": 19, "MH": 14, "HA": 5, "SI": 14}, {"name": "John Prine", "display": "John Prine", "rank": 70, "genre": "Folk / Americana", "years": "1971-2020", "seg": "C", "gap": 19, "si": 9, "spotify": 1500000.0, "lastfm": 534665.0, "craftRank": 32, "craftPct": 83, "knownFor": "\"Angel from Montgomery\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 45, "coverConf": "MED", "subRank": 7, "LC": 24, "MH": 10, "HA": 5, "SI": 9}, {"name": "Patti Smith", "display": "Patti Smith", "rank": 157, "genre": "Rock", "years": "1974-present", "seg": "I", "gap": -67, "si": 11, "spotify": 2400000.0, "lastfm": 1408035.0, "craftRank": 153, "craftPct": 62, "knownFor": "\"Because the Night\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 5, "coverConf": "LOW", "subRank": 22, "LC": 20, "MH": 7, "HA": 4, "SI": 11}, {"name": "Irving Berlin", "display": "Irving Berlin", "rank": 54, "genre": "Songbook", "years": "1907-1989", "seg": "S", "gap": 37, "si": 11, "spotify": 0, "lastfm": 153140.0, "craftRank": 36, "craftPct": 83, "knownFor": "\"White Christmas\" composer", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 150, "coverConf": "HIGH", "subRank": 5, "LC": 18, "MH": 12, "HA": 9, "SI": 11}, {"name": "Alicia Keys", "display": "Alicia Keys", "rank": 54, "genre": "Soul / R&B", "years": "2001-present", "seg": "I", "gap": 38, "si": 12, "spotify": 38697088.0, "lastfm": 4262727.0, "craftRank": 47, "craftPct": 81, "knownFor": "\"Fallin'\"", "sotyWins": 1, "inRRHOF": false, "inSHOF": true, "covers": 42, "coverConf": "MED", "subRank": 16, "LC": 16, "MH": 15, "HA": 9, "SI": 12}, {"name": "Kanye West", "display": "Kanye West", "rank": 139, "genre": "Hip-Hop", "years": "2004-present", "seg": "V", "gap": -46, "si": 14, "spotify": 72136876.0, "lastfm": 8027571.0, "craftRank": 156, "craftPct": 60, "knownFor": "\"Gold Digger\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 3, "coverConf": "LOW", "subRank": 10, "LC": 16, "MH": 9, "HA": 7, "SI": 14}, {"name": "Cole Porter", "display": "Cole Porter", "rank": 26, "genre": "Songbook", "years": "1915-1964", "seg": "S", "gap": 68, "si": 6, "spotify": 0, "lastfm": 253195.0, "craftRank": 4, "craftPct": 97, "knownFor": "\"Night and Day\" composer", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 150, "coverConf": "HIGH", "subRank": 3, "LC": 25, "MH": 15, "HA": 8, "SI": 6}, {"name": "Harold Arlen", "display": "Harold Arlen", "rank": 70, "genre": "Songbook", "years": "1926-1986", "seg": "S", "gap": 25, "si": 9, "spotify": 0, "lastfm": 37922.0, "craftRank": 40, "craftPct": 83, "knownFor": "\"Over the Rainbow\" composer", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 108, "coverConf": "MED-HIGH", "subRank": 6, "LC": 18, "MH": 14, "HA": 9, "SI": 9}, {"name": "Rodgers and Hammerstein", "display": "Rodgers and Hammerstein", "rank": 70, "genre": "Songbook", "years": "1943-1960", "seg": "S", "gap": 25, "si": 6, "spotify": 0, "lastfm": 3680.0, "craftRank": 18, "craftPct": 87, "knownFor": "\"The Sound of Music\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 229, "coverConf": "HIGH", "subRank": 7, "LC": 20, "MH": 14, "HA": 9, "SI": 6}, {"name": "Eminem", "display": "Eminem", "rank": 119, "genre": "Hip-Hop", "years": "1996-present", "seg": "I", "gap": -22, "si": 14, "spotify": 75626974.0, "lastfm": 7851977.0, "craftRank": 131, "craftPct": 65, "knownFor": "\"Lose Yourself\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 2, "coverConf": "LOW", "subRank": 6, "LC": 18, "MH": 7, "HA": 7, "SI": 14}, {"name": "Little Richard", "display": "Little Richard", "rank": 47, "genre": "Rock", "years": "1955-2020", "seg": "A", "gap": 51, "si": 25, "spotify": 1600000.0, "lastfm": 1006649.0, "craftRank": 154, "craftPct": 60, "knownFor": "\"Tutti Frutti\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 20, "coverConf": "LOW", "subRank": 9, "LC": 8, "MH": 10, "HA": 9, "SI": 25}, {"name": "Muddy Waters", "display": "Muddy Waters", "rank": 111, "genre": "Blues", "years": "1941-1983", "seg": "S", "gap": -13, "si": 16, "spotify": 1100000.0, "lastfm": 1102302.0, "craftRank": 151, "craftPct": 62, "knownFor": "\"Hoochie Coochie Man\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 30, "coverConf": "LOW", "subRank": 5, "LC": 12, "MH": 11, "HA": 5, "SI": 16}, {"name": "Leonard Bernstein", "display": "Leonard Bernstein", "rank": 30, "genre": "Songbook", "years": "1944-1990", "seg": "S", "gap": 70, "si": 11, "spotify": 0, "lastfm": 413583.0, "craftRank": 20, "craftPct": 87, "knownFor": "\"West Side Story\" composer", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 50, "coverConf": "MED-HIGH", "subRank": 2, "LC": 20, "MH": 17, "HA": 9, "SI": 11}, {"name": "Stephen Sondheim", "display": "Stephen Sondheim", "rank": 30, "genre": "Songbook", "years": "1954-2021", "seg": "C", "gap": 70, "si": 6, "spotify": 0, "lastfm": 238448.0, "craftRank": 3, "craftPct": 97, "knownFor": "\"Sweeney Todd\" composer", "sotyWins": 1, "inRRHOF": false, "inSHOF": true, "covers": 197, "coverConf": "MED-HIGH", "subRank": 4, "LC": 25, "MH": 17, "HA": 4, "SI": 6}, {"name": "Lady Gaga", "display": "Lady Gaga", "rank": 81, "genre": "Pop", "years": "2008-present", "seg": "V", "gap": 19, "si": 14, "spotify": 104184391.0, "lastfm": 7810211.0, "craftRank": 94, "craftPct": 73, "knownFor": "\"Bad Romance\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 50, "coverConf": "MED", "subRank": 15, "LC": 12, "MH": 12, "HA": 13, "SI": 14}, {"name": "Thom Bell", "display": "Thom Bell", "rank": 81, "genre": "Soul / R&B", "years": "1967-2000", "seg": "I", "gap": 19, "si": 14, "spotify": 0, "lastfm": 314.0, "craftRank": 90, "craftPct": 73, "knownFor": "wrote the Stylistics' and Spinners' hits", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 20, "coverConf": "LOW", "subRank": 19, "LC": 14, "MH": 14, "HA": 9, "SI": 14}, {"name": "Hal David", "display": "Hal David", "rank": 104, "genre": "Soul / R&B", "years": "1951-2012", "seg": "I", "gap": -4, "si": 12, "spotify": 0, "lastfm": 33627.0, "craftRank": 90, "craftPct": 73, "knownFor": "wrote the words to \"Raindrops Keep Fallin' on My Head\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 208, "coverConf": "HIGH", "subRank": 37, "LC": 20, "MH": 7, "HA": 7, "SI": 12}, {"name": "Alanis Morissette", "display": "Alanis Morissette", "rank": 151, "genre": "Pop", "years": "1991-present", "seg": "C", "gap": -51, "si": 9, "spotify": 10173251.0, "lastfm": 2855008.0, "craftRank": 131, "craftPct": 65, "knownFor": "\"You Oughta Know\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": true, "covers": 10, "coverConf": "LOW", "subRank": 27, "LC": 14, "MH": 10, "HA": 8, "SI": 9}, {"name": "Bessie Smith", "display": "Bessie Smith", "rank": 43, "genre": "Blues", "years": "1923-1937", "seg": "S", "gap": 63, "si": 17, "spotify": 71411.0, "lastfm": 366755.0, "craftRank": 80, "craftPct": 75, "knownFor": "the original blues superstar, \"Empress of the Blues\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 0, "coverConf": "", "subRank": 3, "LC": 16, "MH": 12, "HA": 8, "SI": 17}, {"name": "Bo Diddley", "display": "Bo Diddley", "rank": 151, "genre": "Rock", "years": "1955-2007", "seg": "I", "gap": -45, "si": 16, "spotify": 446870.0, "lastfm": 638252.0, "craftRank": 162, "craftPct": 56, "knownFor": "the Bo Diddley beat", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 25, "coverConf": "LOW", "subRank": 21, "LC": 8, "MH": 10, "HA": 7, "SI": 16}, {"name": "Sister Rosetta Tharpe", "display": "Sister Rosetta Tharpe", "rank": 37, "genre": "Gospel", "years": "1938-1973", "seg": "S", "gap": 71, "si": 19, "spotify": 92921.0, "lastfm": 168440.0, "craftRank": 88, "craftPct": 73, "knownFor": "\"the Godmother of Rock and Roll\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 8, "coverConf": "LOW", "subRank": 2, "LC": 14, "MH": 13, "HA": 8, "SI": 19}, {"name": "Nina Simone", "display": "Nina Simone", "rank": 104, "genre": "Jazz", "years": "1954-2003", "seg": "C", "gap": 4, "si": 9, "spotify": 9372335.0, "lastfm": 3010961.0, "craftRank": 82, "craftPct": 75, "knownFor": "\"Feeling Good\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 6, "coverConf": "MED", "subRank": 2, "LC": 18, "MH": 12, "HA": 8, "SI": 9}, {"name": "Joe Strummer", "display": "Joe Strummer", "rank": 139, "genre": "Rock", "years": "1976-2002", "seg": "I", "gap": -29, "si": 11, "spotify": 446100.0, "lastfm": 217739.0, "craftRank": 131, "craftPct": 65, "knownFor": "The Clash", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 10, "coverConf": "LOW", "subRank": 19, "LC": 17, "MH": 10, "HA": 5, "SI": 11}, {"name": "Tom Waits", "display": "Tom Waits", "rank": 54, "genre": "Folk / Americana", "years": "1973-present", "seg": "I", "gap": 57, "si": 11, "spotify": 1368177.0, "lastfm": 1967323.0, "craftRank": 40, "craftPct": 83, "knownFor": "\"Ol' 55\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 229, "coverConf": "HIGH", "subRank": 6, "LC": 23, "MH": 13, "HA": 4, "SI": 11}, {"name": "Tupac Shakur", "display": "Tupac Shakur", "rank": 119, "genre": "Hip-Hop", "years": "1991-1996", "seg": "I", "gap": -7, "si": 14, "spotify": 28813604.0, "lastfm": 4224918.0, "craftRank": 131, "craftPct": 65, "knownFor": "\"California Love\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 1, "coverConf": "LOW", "subRank": 5, "LC": 20, "MH": 5, "HA": 7, "SI": 14}, {"name": "Howlin Wolf", "display": "Howlin Wolf", "rank": 163, "genre": "Blues", "years": "1951-1976", "seg": "I", "gap": -51, "si": 11, "spotify": 811617.0, "lastfm": 852867.0, "craftRank": 163, "craftPct": 56, "knownFor": "\"Smokestack Lightnin'\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 25, "coverConf": "LOW", "subRank": 6, "LC": 13, "MH": 10, "HA": 4, "SI": 11}, {"name": "Leadbelly", "display": "Leadbelly", "rank": 37, "genre": "Blues", "years": "1924-1949", "seg": "A", "gap": 77, "si": 20, "spotify": 0, "lastfm": 313651.0, "craftRank": 98, "craftPct": 71, "knownFor": "\"Goodnight, Irene\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 0, "coverConf": "", "subRank": 2, "LC": 16, "MH": 10, "HA": 7, "SI": 20}, {"name": "Billie Holiday", "display": "Billie Holiday", "rank": 119, "genre": "Jazz", "years": "1933-1959", "seg": "S", "gap": -5, "si": 11, "spotify": 0, "lastfm": 2389527.0, "craftRank": 115, "craftPct": 68, "knownFor": "\"Strange Fruit\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 0, "coverConf": "", "subRank": 4, "LC": 16, "MH": 11, "HA": 6, "SI": 11}, {"name": "Kate Bush", "display": "Kate Bush", "rank": 30, "genre": "Pop", "years": "1978-present", "seg": "I", "gap": 86, "si": 11, "spotify": 15994531.0, "lastfm": 3508064.0, "craftRank": 14, "craftPct": 89, "knownFor": "\"Running Up That Hill\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 25, "coverConf": "LOW", "subRank": 6, "LC": 20, "MH": 15, "HA": 9, "SI": 11}, {"name": "Roger Waters", "display": "Roger Waters", "rank": 47, "genre": "Rock", "years": "1965-present", "seg": "I", "gap": 69, "si": 14, "spotify": 527818.0, "lastfm": 632664.0, "craftRank": 55, "craftPct": 79, "knownFor": "Pink Floyd", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 105, "coverConf": "HIGH", "subRank": 10, "LC": 20, "MH": 12, "HA": 5, "SI": 14}, {"name": "Peter Gabriel", "display": "Peter Gabriel", "rank": 54, "genre": "Pop", "years": "1975-present", "seg": "I", "gap": 62, "si": 11, "spotify": 5312237.0, "lastfm": 1822666.0, "craftRank": 39, "craftPct": 83, "knownFor": "Genesis, \"Sledgehammer\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 30, "coverConf": "LOW", "subRank": 7, "LC": 20, "MH": 14, "HA": 8, "SI": 11}, {"name": "Oasis/Noel Gallagher", "display": "Oasis", "rank": 70, "genre": "Pop", "years": "1991-2009, 2025-present", "seg": "I", "gap": 46, "si": 11, "spotify": 20000000.0, "lastfm": 5946440.0, "craftRank": 55, "craftPct": 79, "knownFor": "Oasis", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 20, "coverConf": "LOW", "subRank": 17, "LC": 17, "MH": 12, "HA": 10, "SI": 11}, {"name": "Jimmy Cliff", "display": "Jimmy Cliff", "rank": 86, "genre": "Reggae", "years": "1962-present", "seg": "I", "gap": 30, "si": 14, "spotify": 2894384.0, "lastfm": 955920.0, "craftRank": 104, "craftPct": 70, "knownFor": "\"The Harder They Come\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 20, "coverConf": "LOW", "subRank": 2, "LC": 15, "MH": 10, "HA": 9, "SI": 14}, {"name": "Mark Knopfler", "display": "Mark Knopfler", "rank": 86, "genre": "Rock", "years": "1977-present", "seg": "I", "gap": 30, "si": 12, "spotify": 2700000.0, "lastfm": 838594.0, "craftRank": 86, "craftPct": 75, "knownFor": "Dire Straits", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 25, "coverConf": "LOW", "subRank": 14, "LC": 17, "MH": 15, "HA": 7, "SI": 12}, {"name": "Sade", "display": "Sade", "rank": 86, "genre": "Soul / R&B", "years": "1984-present", "seg": "I", "gap": 30, "si": 11, "spotify": 26569994.0, "lastfm": 3488448.0, "craftRank": 68, "craftPct": 76, "knownFor": "\"Smooth Operator\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 25, "coverConf": "MED", "subRank": 39, "LC": 15, "MH": 12, "HA": 9, "SI": 11}, {"name": "Jeff Lynne", "display": "Jeff Lynne", "rank": 104, "genre": "Pop", "years": "1966-present", "seg": "C", "gap": 12, "si": 9, "spotify": 18310293.0, "lastfm": 100081.0, "craftRank": 71, "craftPct": 76, "knownFor": "Electric Light Orchestra (ELO)", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 25, "coverConf": "LOW", "subRank": 18, "LC": 12, "MH": 16, "HA": 9, "SI": 9}, {"name": "Carly Simon", "display": "Carly Simon", "rank": 134, "genre": "Folk / Americana", "years": "1971-present", "seg": "C", "gap": -18, "si": 9, "spotify": 6587789.0, "lastfm": 1494409.0, "craftRank": 103, "craftPct": 70, "knownFor": "\"You're So Vain\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 15, "coverConf": "LOW", "subRank": 15, "LC": 15, "MH": 11, "HA": 7, "SI": 9}, {"name": "Missy Elliott", "display": "Missy Elliott", "rank": 139, "genre": "Hip-Hop", "years": "1991-present", "seg": "I", "gap": -23, "si": 14, "spotify": 9400000.0, "lastfm": 2004364.0, "craftRank": 155, "craftPct": 60, "knownFor": "\"Get Ur Freak On\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 1, "coverConf": "LOW", "subRank": 12, "LC": 13, "MH": 9, "HA": 7, "SI": 14}, {"name": "Trent Reznor", "display": "Trent Reznor", "rank": 139, "genre": "Rock", "years": "1989-present", "seg": "I", "gap": -23, "si": 14, "spotify": 5870496.0, "lastfm": 265325.0, "craftRank": 159, "craftPct": 59, "knownFor": "Nine Inch Nails", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 5, "coverConf": "LOW", "subRank": 20, "LC": 13, "MH": 10, "HA": 5, "SI": 14}, {"name": "Mort Shuman", "display": "Mort Shuman", "rank": 160, "genre": "Pop", "years": "1957-1991", "seg": "C", "gap": -44, "si": 9, "spotify": 0, "lastfm": 22052.0, "craftRank": 146, "craftPct": 63, "knownFor": "co-wrote \"Save the Last Dance for Me\" and \"A Teenager in Love\"", "sotyWins": 0, "inRRHOF": true, "inSHOF": false, "covers": 70, "coverConf": "MED", "subRank": 29, "LC": 12, "MH": 12, "HA": 7, "SI": 9}, {"name": "Lucinda Williams", "display": "Lucinda Williams", "rank": 134, "genre": "Folk / Americana", "years": "1978-present", "seg": "I", "gap": -6, "si": 11, "spotify": 772800.0, "lastfm": 604885.0, "craftRank": 121, "craftPct": 68, "knownFor": "\"Car Wheels on a Gravel Road\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 20, "coverConf": "LOW", "subRank": 12, "LC": 20, "MH": 10, "HA": 5, "SI": 11}, {"name": "Billie Eilish", "display": "Billie Eilish", "rank": 139, "genre": "Pop", "years": "2015-present", "seg": "V", "gap": -10, "si": 14, "spotify": 83641296.0, "lastfm": 4270623.0, "craftRank": 158, "craftPct": 60, "knownFor": "\"Bad Guy\"", "sotyWins": 3, "inRRHOF": false, "inSHOF": false, "covers": 35, "coverConf": "MED", "subRank": 23, "LC": 13, "MH": 10, "HA": 8, "SI": 14}, {"name": "Bruno Mars", "display": "Bruno Mars", "rank": 66, "genre": "Soul / R&B", "years": "2010-present", "seg": "V", "gap": 64, "si": 12, "spotify": 134971787.0, "lastfm": 5326653.0, "craftRank": 61, "craftPct": 79, "knownFor": "\"Uptown Funk\"", "sotyWins": 2, "inRRHOF": false, "inSHOF": false, "covers": 58, "coverConf": "MED", "subRank": 18, "LC": 12, "MH": 16, "HA": 13, "SI": 12}, {"name": "Kendrick Lamar", "display": "Kendrick Lamar", "rank": 94, "genre": "Hip-Hop", "years": "2003-present", "seg": "V", "gap": 37, "si": 14, "spotify": 71090979.0, "lastfm": 5154781.0, "craftRank": 122, "craftPct": 68, "knownFor": "\"HUMBLE.\"", "sotyWins": 1, "inRRHOF": false, "inSHOF": false, "covers": 0, "coverConf": "MED", "subRank": 4, "LC": 24, "MH": 7, "HA": 5, "SI": 14}, {"name": "Ed Sheeran", "display": "Ed Sheeran", "rank": 66, "genre": "Soul / R&B", "years": "2011-present", "seg": "V", "gap": 66, "si": 12, "spotify": 86434879.0, "lastfm": 4267958.0, "craftRank": 59, "craftPct": 79, "knownFor": "\"Shape of You\"", "sotyWins": 1, "inRRHOF": false, "inSHOF": false, "covers": 90, "coverConf": "MED", "subRank": 22, "LC": 14, "MH": 14, "HA": 13, "SI": 12}, {"name": "Amy Winehouse", "display": "Amy Winehouse", "rank": 54, "genre": "Soul / R&B", "years": "2003-2011", "seg": "V", "gap": 79, "si": 12, "spotify": 22300000.0, "lastfm": 4678868.0, "craftRank": 59, "craftPct": 79, "knownFor": "\"Rehab\"", "sotyWins": 1, "inRRHOF": false, "inSHOF": false, "covers": 20, "coverConf": "HIGH", "subRank": 13, "LC": 19, "MH": 13, "HA": 10, "SI": 12}, {"name": "Sting", "display": "Sting", "rank": 47, "genre": "Pop", "years": "1977-present", "seg": "I", "gap": 87, "si": 12, "spotify": 12700000.0, "lastfm": 2784297.0, "craftRank": 36, "craftPct": 83, "knownFor": "The Police", "sotyWins": 1, "inRRHOF": false, "inSHOF": false, "covers": 108, "coverConf": "MED-HIGH", "subRank": 10, "LC": 16, "MH": 14, "HA": 8, "SI": 12}, {"name": "Jason Isbell", "display": "Jason Isbell", "rank": 134, "genre": "Folk / Americana", "years": "2001-present", "seg": "I", "gap": 1, "si": 12, "spotify": 618247.0, "lastfm": 265266.0, "craftRank": 127, "craftPct": 67, "knownFor": "Drive-By Truckers", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 8, "coverConf": "LOW", "subRank": 13, "LC": 21, "MH": 9, "HA": 5, "SI": 12}, {"name": "Rakim", "display": "Rakim", "rank": 37, "genre": "Hip-Hop", "years": "1986-present", "seg": "A", "gap": 99, "si": 25, "spotify": 604.0, "lastfm": 653025.0, "craftRank": 140, "craftPct": 63, "knownFor": "Eric B. & Rakim", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 1, "coverConf": "LOW", "subRank": 2, "LC": 20, "MH": 4, "HA": 4, "SI": 25}, {"name": "Cat Stevens", "display": "Cat Stevens", "rank": 104, "genre": "Folk / Americana", "years": "1966-present", "seg": "I", "gap": 32, "si": 9, "spotify": 8996320.0, "lastfm": 1465411.0, "craftRank": 74, "craftPct": 76, "knownFor": "\"Wild World\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 48, "coverConf": "MED", "subRank": 10, "LC": 17, "MH": 13, "HA": 8, "SI": 9}, {"name": "Gil Scott-Heron", "display": "Gil Scott-Heron", "rank": 30, "genre": "Hip-Hop", "years": "1970-2011", "seg": "A", "gap": 108, "si": 25, "spotify": 588492.0, "lastfm": 826334.0, "craftRank": 135, "craftPct": 65, "knownFor": "\"The Revolution Will Not Be Televised\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 22, "coverConf": "MED", "subRank": 1, "LC": 22, "MH": 7, "HA": 4, "SI": 25}, {"name": "Frank Ocean", "display": "Frank Ocean", "rank": 94, "genre": "Soul / R&B", "years": "2011-present", "seg": "V", "gap": 44, "si": 14, "spotify": 40685292.0, "lastfm": 4320595.0, "craftRank": 111, "craftPct": 70, "knownFor": "\"Thinkin Bout You\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 15, "coverConf": "MED", "subRank": 32, "LC": 22, "MH": 11, "HA": 5, "SI": 14}, {"name": "Gram Parsons", "display": "Gram Parsons", "rank": 104, "genre": "Country", "years": "1968-1973", "seg": "I", "gap": 34, "si": 15, "spotify": 206651.0, "lastfm": 282141.0, "craftRank": 128, "craftPct": 67, "knownFor": "The Byrds, Flying Burrito Brothers", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 35, "coverConf": "MED", "subRank": 9, "LC": 17, "MH": 11, "HA": 8, "SI": 15}, {"name": "Gordon Lightfoot", "display": "Gordon Lightfoot", "rank": 111, "genre": "Country", "years": "1962-2023", "seg": "C", "gap": 27, "si": 9, "spotify": 3900000.0, "lastfm": 672210.0, "craftRank": 82, "craftPct": 75, "knownFor": "\"If You Could Read My Mind\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 133, "coverConf": "MED-HIGH", "subRank": 12, "LC": 18, "MH": 11, "HA": 7, "SI": 9}, {"name": "Chuck D", "display": "Chuck D", "rank": 139, "genre": "Hip-Hop", "years": "1987-present", "seg": "I", "gap": -1, "si": 11, "spotify": 36700.0, "lastfm": 25543.0, "craftRank": 142, "craftPct": 63, "knownFor": "Public Enemy", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 1, "coverConf": "LOW", "subRank": 11, "LC": 22, "MH": 5, "HA": 4, "SI": 11}, {"name": "Lana Del Rey", "display": "Lana Del Rey", "rank": 139, "genre": "Pop", "years": "2010-present", "seg": "V", "gap": 4, "si": 11, "spotify": 63415468.0, "lastfm": 5324321.0, "craftRank": 137, "craftPct": 65, "knownFor": "\"Video Games\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 3, "coverConf": "LOW", "subRank": 24, "LC": 17, "MH": 11, "HA": 7, "SI": 11}, {"name": "Thomas A. Dorsey", "display": "Thomas A. Dorsey", "rank": 30, "genre": "Gospel", "years": "1928-1993", "seg": "A", "gap": 114, "si": 25, "spotify": 7168.0, "lastfm": 9109.0, "craftRank": 135, "craftPct": 65, "knownFor": "wrote \"Take My Hand, Precious Lord,\" the gospel standard", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 0, "coverConf": "", "subRank": 1, "LC": 16, "MH": 11, "HA": 5, "SI": 25}, {"name": "Lauryn Hill", "display": "Lauryn Hill", "rank": 54, "genre": "Hip-Hop", "years": "1993-present", "seg": "I", "gap": 90, "si": 14, "spotify": 14300000.0, "lastfm": 1112063.0, "craftRank": 74, "craftPct": 76, "knownFor": "Fugees, \"Doo Wop (That Thing)\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 5, "coverConf": "LOW", "subRank": 3, "LC": 20, "MH": 11, "HA": 8, "SI": 14}, {"name": "Beyonce", "display": "Beyonce", "rank": 94, "genre": "Soul / R&B", "years": "1997-present", "seg": "I", "gap": 50, "si": 12, "spotify": 61622180.0, "lastfm": 6447027.0, "craftRank": 90, "craftPct": 73, "knownFor": "Destiny's Child", "sotyWins": 1, "inRRHOF": false, "inSHOF": false, "covers": 55, "coverConf": "MED", "subRank": 28, "LC": 13, "MH": 12, "HA": 10, "SI": 12}, {"name": "John Hiatt", "display": "John Hiatt", "rank": 111, "genre": "Folk / Americana", "years": "1974-present", "seg": "C", "gap": 33, "si": 9, "spotify": 849700.0, "lastfm": 397998.0, "craftRank": 71, "craftPct": 76, "knownFor": "\"Have a Little Faith in Me\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 25, "coverConf": "LOW", "subRank": 9, "LC": 20, "MH": 12, "HA": 5, "SI": 9}, {"name": "Nick Drake", "display": "Nick Drake", "rank": 111, "genre": "Folk / Americana", "years": "1969-1974", "seg": "C", "gap": 33, "si": 9, "spotify": 2094731.0, "lastfm": 2267271.0, "craftRank": 82, "craftPct": 75, "knownFor": "\"Pink Moon\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 10, "coverConf": "LOW", "subRank": 11, "LC": 21, "MH": 13, "HA": 4, "SI": 9}, {"name": "Andre 3000", "display": "Andre 3000", "rank": 119, "genre": "Hip-Hop", "years": "1994-present", "seg": "I", "gap": 25, "si": 12, "spotify": 1057653.0, "lastfm": 218589.0, "craftRank": 115, "craftPct": 68, "knownFor": "OutKast", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 2, "coverConf": "LOW", "subRank": 9, "LC": 20, "MH": 7, "HA": 7, "SI": 12}, {"name": "Drake", "display": "Drake", "rank": 119, "genre": "Soul / R&B", "years": "2006-present", "seg": "V", "gap": 25, "si": 14, "spotify": 98847667.0, "lastfm": 6816985.0, "craftRank": 149, "craftPct": 63, "knownFor": "\"Hotline Bling\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 15, "coverConf": "MED", "subRank": 36, "LC": 16, "MH": 7, "HA": 10, "SI": 14}, {"name": "Nick Cave", "display": "Nick Cave", "rank": 119, "genre": "Rock", "years": "1978-present", "seg": "I", "gap": 25, "si": 11, "spotify": 3700000.0, "lastfm": 599725.0, "craftRank": 100, "craftPct": 71, "knownFor": "the Bad Seeds", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 40, "coverConf": "MED", "subRank": 18, "LC": 21, "MH": 10, "HA": 4, "SI": 11}, {"name": "Fiona Apple", "display": "Fiona Apple", "rank": 127, "genre": "Pop", "years": "1996-present", "seg": "C", "gap": 17, "si": 9, "spotify": 2600000.0, "lastfm": 2754860.0, "craftRank": 94, "craftPct": 73, "knownFor": "\"Criminal\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 5, "coverConf": "LOW", "subRank": 21, "LC": 21, "MH": 13, "HA": 5, "SI": 9}, {"name": "Nas", "display": "Nas", "rank": 127, "genre": "Hip-Hop", "years": "1994-present", "seg": "I", "gap": 17, "si": 11, "spotify": 9084223.0, "lastfm": 3405822.0, "craftRank": 115, "craftPct": 68, "knownFor": "\"N.Y. State of Mind\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 1, "coverConf": "LOW", "subRank": 8, "LC": 25, "MH": 5, "HA": 4, "SI": 11}, {"name": "Townes Van Zandt", "display": "Townes Van Zandt", "rank": 127, "genre": "Country", "years": "1968-1997", "seg": "C", "gap": 17, "si": 9, "spotify": 905400.0, "lastfm": 748446.0, "craftRank": 93, "craftPct": 73, "knownFor": "wrote \"Pancho and Lefty\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 30, "coverConf": "LOW", "subRank": 10, "LC": 25, "MH": 9, "HA": 4, "SI": 9}, {"name": "Barry White", "display": "Barry White", "rank": 134, "genre": "Soul / R&B", "years": "1960-2003", "seg": "I", "gap": 10, "si": 12, "spotify": 5724505.0, "lastfm": 1325907.0, "craftRank": 129, "craftPct": 65, "knownFor": "\"Can't Get Enough of Your Love, Babe\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 15, "coverConf": "LOW", "subRank": 42, "LC": 8, "MH": 14, "HA": 8, "SI": 12}, {"name": "Sufjan Stevens", "display": "Sufjan Stevens", "rank": 134, "genre": "Folk / Americana", "years": "1999-present", "seg": "C", "gap": 10, "si": 9, "spotify": 13600000.0, "lastfm": 3981643.0, "craftRank": 102, "craftPct": 71, "knownFor": "\"Chicago\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 8, "coverConf": "LOW", "subRank": 14, "LC": 20, "MH": 12, "HA": 5, "SI": 9}, {"name": "Jeff Tweedy", "display": "Jeff Tweedy", "rank": 149, "genre": "Folk / Americana", "years": "1990-present", "seg": "I", "gap": -5, "si": 12, "spotify": 273658.0, "lastfm": 255909.0, "craftRank": 146, "craftPct": 63, "knownFor": "Wilco", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 20, "coverConf": "LOW", "subRank": 16, "LC": 17, "MH": 10, "HA": 5, "SI": 12}, {"name": "Gillian Welch", "display": "Gillian Welch", "rank": 151, "genre": "Folk / Americana", "years": "1996-present", "seg": "C", "gap": -7, "si": 9, "spotify": 700363.0, "lastfm": 523284.0, "craftRank": 122, "craftPct": 68, "knownFor": "\"Time (The Revelator)\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 8, "coverConf": "LOW", "subRank": 18, "LC": 22, "MH": 10, "HA": 4, "SI": 9}, {"name": "Richard Thompson", "display": "Richard Thompson", "rank": 151, "genre": "Folk / Americana", "years": "1967-present", "seg": "I", "gap": -7, "si": 11, "spotify": 210930.0, "lastfm": 295592.0, "craftRank": 138, "craftPct": 65, "knownFor": "Fairport Convention", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 30, "coverConf": "LOW", "subRank": 17, "LC": 18, "MH": 13, "HA": 5, "SI": 11}, {"name": "Warren Zevon", "display": "Warren Zevon", "rank": 151, "genre": "Pop", "years": "1969-2003", "seg": "C", "gap": -7, "si": 9, "spotify": 1849092.0, "lastfm": 787770.0, "craftRank": 125, "craftPct": 67, "knownFor": "\"Werewolves of London\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 20, "coverConf": "LOW", "subRank": 26, "LC": 19, "MH": 10, "HA": 5, "SI": 9}, {"name": "Katy Perry", "display": "Katy Perry", "rank": 157, "genre": "Pop", "years": "2007-present", "seg": "V", "gap": -13, "si": 9, "spotify": 86939334.0, "lastfm": 7250947.0, "craftRank": 149, "craftPct": 63, "knownFor": "\"Firework\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 3, "coverConf": "LOW", "subRank": 28, "LC": 10, "MH": 11, "HA": 12, "SI": 9}, {"name": "The Weeknd", "display": "The Weeknd", "rank": 157, "genre": "Soul / R&B", "years": "2011-present", "seg": "V", "gap": -13, "si": 14, "spotify": 114851947.0, "lastfm": 5355795.0, "craftRank": 164, "craftPct": 56, "knownFor": "\"Blinding Lights\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 2, "coverConf": "LOW", "subRank": 43, "LC": 10, "MH": 11, "HA": 8, "SI": 14}, {"name": "J. Cole", "display": "J. Cole", "rank": 160, "genre": "Hip-Hop", "years": "2007-present", "seg": "V", "gap": -16, "si": 11, "spotify": 39309702.0, "lastfm": 3905334.0, "craftRank": 161, "craftPct": 59, "knownFor": "\"No Role Modelz\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 1, "coverConf": "LOW", "subRank": 14, "LC": 21, "MH": 5, "HA": 5, "SI": 11}, {"name": "Guy Clark", "display": "Guy Clark", "rank": 164, "genre": "Country", "years": "1975-2016", "seg": "C", "gap": -20, "si": 9, "spotify": 268978.0, "lastfm": 199929.0, "craftRank": 157, "craftPct": 60, "knownFor": "wrote \"L.A. Freeway\" and \"Desperados Waiting for a Train\"", "sotyWins": 0, "inRRHOF": false, "inSHOF": false, "covers": 35, "coverConf": "LOW", "subRank": 15, "LC": 20, "MH": 9, "HA": 4, "SI": 9}];
+const SONG_POOL = [{"song": "Yesterday", "writer": "Paul McCartney", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 1, "notes": "Writer credited as Lennon and McCartney."}, {"song": "Blackbird", "writer": "Paul McCartney", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 1, "notes": "Writer credited as Lennon and McCartney."}, {"song": "Hey Jude", "writer": "Paul McCartney", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 1, "notes": "Writer credited as Lennon and McCartney."}, {"song": "Let It Be", "writer": "Paul McCartney", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 1, "notes": "Writer credited as Lennon and McCartney."}, {"song": "In My Life", "writer": "John Lennon", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 2, "notes": "Writer credited as Lennon and McCartney."}, {"song": "A Day in the Life", "writer": "John Lennon", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 2, "notes": "Writer credited as Lennon and McCartney."}, {"song": "Come Together", "writer": "John Lennon", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 2, "notes": "Writer credited as Lennon and McCartney."}, {"song": "Blowin' in the Wind", "writer": "Bob Dylan", "performer": "Peter Paul and Mary", "genre": "Folk / Americana", "era": "rise", "writerRank": 3, "notes": "Original: Bob Dylan."}, {"song": "Mr. Tambourine Man", "writer": "Bob Dylan", "performer": "The Byrds", "genre": "Folk / Americana", "era": "rise", "writerRank": 3, "notes": "Original: Bob Dylan."}, {"song": "The Sound of Silence", "writer": "Paul Simon", "performer": "Simon and Garfunkel", "genre": "Folk / Americana", "era": "rise", "writerRank": 8, "notes": ""}, {"song": "Mrs. Robinson", "writer": "Paul Simon", "performer": "Simon and Garfunkel", "genre": "Folk / Americana", "era": "rise", "writerRank": 8, "notes": ""}, {"song": "Bridge Over Troubled Water", "writer": "Paul Simon", "performer": "Simon and Garfunkel", "genre": "Folk / Americana", "era": "rise", "writerRank": 8, "notes": ""}, {"song": "Will You Love Me Tomorrow", "writer": "Carole King", "performer": "The Shirelles", "genre": "Soul / R&B", "era": "rise", "writerRank": 47, "notes": "Writer Carole King recorded a later version."}, {"song": "Up on the Roof", "writer": "Carole King", "performer": "The Drifters", "genre": "Soul / R&B", "era": "rise", "writerRank": 47, "notes": "Writer Carole King recorded a later version."}, {"song": "You've Got a Friend", "writer": "Carole King", "performer": "James Taylor", "genre": "Soul / R&B", "era": "rise", "writerRank": 47, "notes": "Original: Carole King. James Taylor had the hit single."}, {"song": "Sympathy for the Devil", "writer": "Mick Jagger/Richards", "performer": "The Rolling Stones", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": "The file lists the writer type incorrectly as wrote for others."}, {"song": "(I Can't Get No) Satisfaction", "writer": "Mick Jagger/Richards", "performer": "The Rolling Stones", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": "The file lists the writer type incorrectly as wrote for others."}, {"song": "Paint It Black", "writer": "Mick Jagger/Richards", "performer": "The Rolling Stones", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": "The file lists the writer type incorrectly as wrote for others."}, {"song": "Gimme Shelter", "writer": "Mick Jagger/Richards", "performer": "The Rolling Stones", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": "The file lists the writer type incorrectly as wrote for others."}, {"song": "Wild Horses", "writer": "Mick Jagger/Richards", "performer": "The Rolling Stones", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": "Original: The Flying Burrito Brothers. The file lists the writer type incorrectly as wrote for others."}, {"song": "The Tracks of My Tears", "writer": "Smokey Robinson", "performer": "The Miracles", "genre": "Soul / R&B", "era": "rise", "writerRank": 43, "notes": ""}, {"song": "My Girl", "writer": "Smokey Robinson", "performer": "The Temptations", "genre": "Soul / R&B", "era": "rise", "writerRank": 43, "notes": ""}, {"song": "God Only Knows", "writer": "Brian Wilson", "performer": "The Beach Boys", "genre": "Pop", "era": "rise", "writerRank": 14, "notes": ""}, {"song": "In My Room", "writer": "Brian Wilson", "performer": "The Beach Boys", "genre": "Pop", "era": "rise", "writerRank": 14, "notes": ""}, {"song": "California Girls", "writer": "Brian Wilson", "performer": "The Beach Boys", "genre": "Pop", "era": "rise", "writerRank": 14, "notes": ""}, {"song": "Good Vibrations", "writer": "Brian Wilson", "performer": "The Beach Boys", "genre": "Pop", "era": "rise", "writerRank": 14, "notes": ""}, {"song": "Wouldn't It Be Nice", "writer": "Brian Wilson", "performer": "The Beach Boys", "genre": "Pop", "era": "rise", "writerRank": 14, "notes": ""}, {"song": "Both Sides Now", "writer": "Joni Mitchell", "performer": "Judy Collins", "genre": "Folk / Americana", "era": "rise", "writerRank": 12, "notes": "Writer Joni Mitchell recorded a well known version later."}, {"song": "Woodstock", "writer": "Joni Mitchell", "performer": "Crosby Stills Nash and Young", "genre": "Folk / Americana", "era": "rise", "writerRank": 12, "notes": "Original: Joni Mitchell."}, {"song": "Hallelujah", "writer": "Leonard Cohen", "performer": "Jeff Buckley", "genre": "Folk / Americana", "era": "golden", "writerRank": 37, "notes": "Original: Leonard Cohen. \"Hallelujah\" Cohen 1984 orig, Buckley 1994 best-known; contested"}, {"song": "Stop in the Name of Love", "writer": "Holland/Dozier/Holland", "performer": "The Supremes", "genre": "Soul / R&B", "era": "rise", "writerRank": 86, "notes": "HDH \"Stop! In the Name of Love\" #1 1965"}, {"song": "Heat Wave", "writer": "Holland/Dozier/Holland", "performer": "Martha & the Vandellas", "genre": "Soul / R&B", "era": "rise", "writerRank": 86, "notes": "HDH \"Heat Wave\" 1963"}, {"song": "I Can't Help Myself (Sugar Pie Honey Bunch)", "writer": "Holland/Dozier/Holland", "performer": "Four Tops", "genre": "Soul / R&B", "era": "rise", "writerRank": 86, "notes": "HDH \"I Can't Help Myself\" 1965"}, {"song": "Reach Out I'll Be There", "writer": "Holland/Dozier/Holland", "performer": "Four Tops", "genre": "Soul / R&B", "era": "rise", "writerRank": 86, "notes": "HDH \"Reach Out I'll Be There\" 1966"}, {"song": "Alfie", "writer": "Burt Bacharach", "performer": "Cilla Black", "genre": "Soul / R&B", "era": "founders", "writerRank": 54, "notes": "\"Alfie\" 1966; Dionne Warwick also canonical; co-write Bacharach+David"}, {"song": "Walk On By", "writer": "Burt Bacharach", "performer": "Dionne Warwick", "genre": "Soul / R&B", "era": "founders", "writerRank": 54, "notes": "File incorrectly lists writer type as self."}, {"song": "What the World Needs Now Is Love", "writer": "Burt Bacharach", "performer": "Jackie DeShannon", "genre": "Soul / R&B", "era": "founders", "writerRank": 54, "notes": "File incorrectly lists writer type as self."}, {"song": "Raindrops Keep Fallin' on My Head", "writer": "Burt Bacharach", "performer": "B.J. Thomas", "genre": "Soul / R&B", "era": "founders", "writerRank": 54, "notes": "File incorrectly lists writer type as self."}, {"song": "Nothing Compares 2 U", "writer": "Prince", "performer": "Sinead O'Connor", "genre": "Soul / R&B", "era": "golden", "writerRank": 15, "notes": "Original: The Family."}, {"song": "Stand By Me", "writer": "Leiber/Stoller", "performer": "Ben E. King", "genre": "Soul / R&B", "era": "founders", "writerRank": 70, "notes": "\"Stand By Me\" 1961, King co-wrote"}, {"song": "Hound Dog", "writer": "Leiber/Stoller", "performer": "Elvis Presley", "genre": "Soul / R&B", "era": "founders", "writerRank": 70, "notes": "\"Hound Dog\" best-known; Big Mama Thornton 1952 original"}, {"song": "Jailhouse Rock", "writer": "Leiber/Stoller", "performer": "Elvis Presley", "genre": "Soul / R&B", "era": "founders", "writerRank": 70, "notes": "\"Jailhouse Rock\" 1957"}, {"song": "Yakety Yak", "writer": "Leiber/Stoller", "performer": "The Coasters", "genre": "Soul / R&B", "era": "founders", "writerRank": 70, "notes": "\"Yakety Yak\" 1958"}, {"song": "Be My Baby", "writer": "Ellie Greenwich", "performer": "The Ronettes", "genre": "Soul / R&B", "era": "rise", "writerRank": 127, "notes": "File incorrectly lists writer type as self."}, {"song": "Chapel of Love", "writer": "Ellie Greenwich", "performer": "The Dixie Cups", "genre": "Soul / R&B", "era": "rise", "writerRank": 127, "notes": "File incorrectly lists writer type as self."}, {"song": "Leader of the Pack", "writer": "Ellie Greenwich", "performer": "The Shangri-Las", "genre": "Soul / R&B", "era": "rise", "writerRank": 127, "notes": "File incorrectly lists writer type as self."}, {"song": "That'll Be the Day", "writer": "Buddy Holly", "performer": "The Crickets", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": ""}, {"song": "Not Fade Away", "writer": "Buddy Holly", "performer": "The Crickets", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": ""}, {"song": "Heroin", "writer": "Lou Reed", "performer": "The Velvet Underground", "genre": "Pop", "era": "rise", "writerRank": 104, "notes": ""}, {"song": "I Will Always Love You", "writer": "Dolly Parton", "performer": "Whitney Houston", "genre": "Country", "era": "rise", "writerRank": 43, "notes": "Original: Dolly Parton. \"I Will Always Love You\" Parton 1973 orig, Houston 1992 best-known"}, {"song": "Baba O'Riley", "writer": "Pete Townshend", "performer": "The Who", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": ""}, {"song": "My Generation", "writer": "Pete Townshend", "performer": "The Who", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": ""}, {"song": "Pinball Wizard", "writer": "Pete Townshend", "performer": "The Who", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": ""}, {"song": "Behind Blue Eyes", "writer": "Pete Townshend", "performer": "The Who", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": ""}, {"song": "Won't Get Fooled Again", "writer": "Pete Townshend", "performer": "The Who", "genre": "Rock", "era": "rise", "writerRank": 21, "notes": ""}, {"song": "Everyday People", "writer": "Sly Stone", "performer": "Sly and the Family Stone", "genre": "Soul / R&B", "era": "golden", "writerRank": 54, "notes": ""}, {"song": "Thank You (Falettinme Be Mice Elf Agin)", "writer": "Sly Stone", "performer": "Sly and the Family Stone", "genre": "Soul / R&B", "era": "golden", "writerRank": 54, "notes": ""}, {"song": "Fortunate Son", "writer": "John Fogerty", "performer": "Creedence Clearwater Revival", "genre": "Soul / R&B", "era": "rise", "writerRank": 70, "notes": ""}, {"song": "Bad Moon Rising", "writer": "John Fogerty", "performer": "Creedence Clearwater Revival", "genre": "Soul / R&B", "era": "rise", "writerRank": 70, "notes": ""}, {"song": "Proud Mary", "writer": "John Fogerty", "performer": "Creedence Clearwater Revival", "genre": "Soul / R&B", "era": "rise", "writerRank": 70, "notes": ""}, {"song": "The Weight", "writer": "Robbie Robertson", "performer": "The Band", "genre": "Folk / Americana", "era": "rise", "writerRank": 94, "notes": ""}, {"song": "The Night They Drove Old Dixie Down", "writer": "Robbie Robertson", "performer": "The Band", "genre": "Folk / Americana", "era": "rise", "writerRank": 94, "notes": ""}, {"song": "Up on Cripple Creek", "writer": "Robbie Robertson", "performer": "The Band", "genre": "Folk / Americana", "era": "rise", "writerRank": 94, "notes": ""}, {"song": "Flash Light", "writer": "George Clinton", "performer": "Parliament", "genre": "Soul / R&B", "era": "rise", "writerRank": 94, "notes": ""}, {"song": "One Nation Under a Groove", "writer": "George Clinton", "performer": "Funkadelic", "genre": "Soul / R&B", "era": "rise", "writerRank": 94, "notes": ""}, {"song": "Hoochie Coochie Man", "writer": "Willie Dixon", "performer": "Muddy Waters", "genre": "Blues", "era": "founders", "writerRank": 104, "notes": "The file incorrectly lists writer type as self."}, {"song": "I Just Want to Make Love to You", "writer": "Willie Dixon", "performer": "Muddy Waters", "genre": "Blues", "era": "founders", "writerRank": 104, "notes": "The file incorrectly lists writer type as self."}, {"song": "Back Door Man", "writer": "Willie Dixon", "performer": "Howlin' Wolf", "genre": "Blues", "era": "founders", "writerRank": 104, "notes": "The file incorrectly lists writer type as self."}, {"song": "Spoonful", "writer": "Willie Dixon", "performer": "Howlin' Wolf", "genre": "Blues", "era": "founders", "writerRank": 104, "notes": "The file incorrectly lists writer type as self."}, {"song": "Little Red Rooster", "writer": "Willie Dixon", "performer": "Howlin' Wolf", "genre": "Blues", "era": "founders", "writerRank": 104, "notes": "The file incorrectly lists writer type as self."}, {"song": "You Shook Me", "writer": "Willie Dixon", "performer": "Led Zeppelin", "genre": "Blues", "era": "founders", "writerRank": 104, "notes": "Original: Muddy Waters. The file incorrectly lists writer type as self."}, {"song": "You Need Love, A.K.A. Whole Lotta Love", "writer": "Willie Dixon", "performer": "Led Zeppelin", "genre": "Blues", "era": "founders", "writerRank": 104, "notes": "Original: Muddy Waters. The song Whole Lotta Love adapts You Need Love by Muddy Waters. The file incorrectly lists writer type as self."}, {"song": "Crazy", "writer": "Willie Nelson", "performer": "Patsy Cline", "genre": "Country", "era": "rise", "writerRank": 70, "notes": "Original: Willie Nelson. Willie Nelson recorded his own version in 1962."}, {"song": "Landslide", "writer": "Stevie Nicks", "performer": "Fleetwood Mac", "genre": "Rock", "era": "golden", "writerRank": 86, "notes": ""}, {"song": "Rhiannon", "writer": "Stevie Nicks", "performer": "Fleetwood Mac", "genre": "Rock", "era": "golden", "writerRank": 86, "notes": ""}, {"song": "Gold Dust Woman", "writer": "Stevie Nicks", "performer": "Fleetwood Mac", "genre": "Rock", "era": "golden", "writerRank": 86, "notes": ""}, {"song": "People Get Ready", "writer": "Curtis Mayfield", "performer": "The Impressions", "genre": "Soul / R&B", "era": "rise", "writerRank": 21, "notes": ""}, {"song": "Me and Mrs. Jones", "writer": "Gamble/Huff", "performer": "Billy Paul", "genre": "Soul / R&B", "era": "rise", "writerRank": 94, "notes": "\"Me and Mrs. Jones\" 1972"}, {"song": "If You Don't Know Me By Now", "writer": "Gamble/Huff", "performer": "Harold Melvin & the Blue Notes", "genre": "Soul / R&B", "era": "rise", "writerRank": 94, "notes": "\"If You Don't Know Me By Now\" 1972; Simply Red 1989 cover"}, {"song": "For the Love of Money", "writer": "Gamble/Huff", "performer": "The O'Jays", "genre": "Soul / R&B", "era": "rise", "writerRank": 94, "notes": "\"For the Love of Money\" 1974"}, {"song": "Working in a Coal Mine", "writer": "Allen Toussaint", "performer": "Lee Dorsey", "genre": "Soul / R&B", "era": "rise", "writerRank": 70, "notes": "The file incorrectly lists writer type as self."}, {"song": "Southern Nights", "writer": "Allen Toussaint", "performer": "Glen Campbell", "genre": "Soul / R&B", "era": "rise", "writerRank": 70, "notes": "Original: Allen Toussaint. The file incorrectly lists writer type as self."}, {"song": "Ain't No Mountain High Enough", "writer": "Ashford and Simpson", "performer": "Diana Ross", "genre": "Soul / R&B", "era": "rise", "writerRank": 119, "notes": "Gaye/Terrell 1967 AND Ross 1970 #1 both canonical"}, {"song": "Ain't Nothing Like the Real Thing", "writer": "Ashford and Simpson", "performer": "Marvin Gaye & Tammi Terrell", "genre": "Soul / R&B", "era": "rise", "writerRank": 119, "notes": "\"Ain't Nothing Like the Real Thing\" 1968"}, {"song": "Wichita Lineman", "writer": "Jimmy Webb", "performer": "Glen Campbell", "genre": "Country", "era": "rise", "writerRank": 37, "notes": "Jimmy Webb \"Wichita Lineman\""}, {"song": "By the Time I Get to Phoenix", "writer": "Jimmy Webb", "performer": "Glen Campbell", "genre": "Country", "era": "rise", "writerRank": 37, "notes": "Jimmy Webb \"By the Time I Get to Phoenix\""}, {"song": "The Worst That Could Happen", "writer": "Jimmy Webb", "performer": "Brooklyn Bridge", "genre": "Country", "era": "rise", "writerRank": 37, "notes": "Jimmy Webb; 5th Dimension original 1967, Brooklyn Bridge #3 1969 best-known"}, {"song": "MacArthur Park", "writer": "Jimmy Webb", "performer": "Richard Harris", "genre": "Country", "era": "rise", "writerRank": 37, "notes": "\"MacArthur Park\" 1968; Donna Summer 1978 cover"}, {"song": "Galveston", "writer": "Jimmy Webb", "performer": "Glen Campbell", "genre": "Country", "era": "rise", "writerRank": 37, "notes": "Jimmy Webb \"Galveston\" 1969"}, {"song": "Something", "writer": "George Harrison", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 47, "notes": ""}, {"song": "Within You Without You", "writer": "George Harrison", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 47, "notes": ""}, {"song": "Here Comes the Sun", "writer": "George Harrison", "performer": "The Beatles", "genre": "Pop", "era": "rise", "writerRank": 47, "notes": ""}, {"song": "...Baby One More Time", "writer": "Max Martin", "performer": "Britney Spears", "genre": "Pop", "era": "modern", "writerRank": 139, "notes": "\"...Baby One More Time\" 1998"}, {"song": "I Want It That Way", "writer": "Max Martin", "performer": "Backstreet Boys", "genre": "Pop", "era": "modern", "writerRank": 139, "notes": "\"I Want It That Way\" 1999"}, {"song": "Since U Been Gone", "writer": "Max Martin", "performer": "Kelly Clarkson", "genre": "Pop", "era": "modern", "writerRank": 139, "notes": "\"Since U Been Gone\" 2004; co-write Dr. Luke"}, {"song": "Respect", "writer": "Otis Redding", "performer": "Aretha Franklin", "genre": "Soul / R&B", "era": "founders", "writerRank": 43, "notes": "Original: Otis Redding. \"Respect\" Redding 1965 orig, Franklin 1967 best-known"}, {"song": "Black and Blue", "writer": "Fats Waller", "performer": "Louis Armstrong", "genre": "Jazz", "era": "founders", "writerRank": 111, "notes": "Original: Edith Wilson."}, {"song": "Papa Was a Rollin Stone", "writer": "Norman Whitfield", "performer": "The Temptations", "genre": "Soul / R&B", "era": "golden", "writerRank": 81, "notes": "\"Papa Was a Rollin' Stone\"; Undisputed Truth original 1972"}, {"song": "Cloud Nine", "writer": "Norman Whitfield", "performer": "The Temptations", "genre": "Soul / R&B", "era": "golden", "writerRank": 81, "notes": "Whitfield/Strong \"Cloud Nine\""}, {"song": "Ball of Confusion", "writer": "Norman Whitfield", "performer": "The Temptations", "genre": "Soul / R&B", "era": "golden", "writerRank": 81, "notes": "Whitfield/Strong \"Ball of Confusion\""}, {"song": "Good Times", "writer": "Nile Rodgers", "performer": "Chic", "genre": "Soul / R&B", "era": "golden", "writerRank": 47, "notes": "Writer Nile Rodgers performed this as a member of Chic."}, {"song": "Le Freak", "writer": "Nile Rodgers", "performer": "Chic", "genre": "Soul / R&B", "era": "golden", "writerRank": 47, "notes": "Writer Nile Rodgers performed this as a member of Chic."}, {"song": "Get Lucky", "writer": "Nile Rodgers", "performer": "Daft Punk", "genre": "Soul / R&B", "era": "golden", "writerRank": 47, "notes": "Featuring Pharrell Williams and writer Nile Rodgers."}, {"song": "Where Have All the Flowers Gone", "writer": "Pete Seeger", "performer": "The Kingston Trio", "genre": "Folk / Americana", "era": "founders", "writerRank": 160, "notes": "Original: Pete Seeger."}, {"song": "We Shall Overcome", "writer": "Pete Seeger", "performer": "Joan Baez", "genre": "Folk / Americana", "era": "founders", "writerRank": 160, "notes": "Original: Pete Seeger."}, {"song": "If I Had a Hammer", "writer": "Pete Seeger", "performer": "Peter, Paul and Mary", "genre": "Folk / Americana", "era": "founders", "writerRank": 160, "notes": "Original: The Weavers."}, {"song": "Turn Turn Turn", "writer": "Pete Seeger", "performer": "The Byrds", "genre": "Folk / Americana", "era": "founders", "writerRank": 160, "notes": "Original: The Limeliters."}, {"song": "I Got Rhythm", "writer": "George and Ira Gershwin", "performer": "Ethel Merman", "genre": "Songbook", "era": "founders", "writerRank": 15, "notes": ""}, {"song": "Save the Last Dance for Me", "writer": "Doc Pomus", "performer": "The Drifters", "genre": "Soul / R&B", "era": "founders", "writerRank": 151, "notes": "\"Save the Last Dance for Me\" 1960; co-write Shuman"}, {"song": "This Magic Moment", "writer": "Doc Pomus", "performer": "The Drifters", "genre": "Soul / R&B", "era": "founders", "writerRank": 151, "notes": "\"This Magic Moment\" 1960"}, {"song": "Little Sister", "writer": "Doc Pomus", "performer": "Elvis Presley", "genre": "Soul / R&B", "era": "founders", "writerRank": 151, "notes": "Pomus/Shuman \"Little Sister\" 1961"}, {"song": "Lush Life", "writer": "Billy Strayhorn", "performer": "Nat King Cole", "genre": "Jazz", "era": "founders", "writerRank": 111, "notes": ""}, {"song": "Chelsea Bridge", "writer": "Billy Strayhorn", "performer": "Duke Ellington", "genre": "Jazz", "era": "founders", "writerRank": 111, "notes": ""}, {"song": "Take the A Train", "writer": "Billy Strayhorn", "performer": "Duke Ellington", "genre": "Jazz", "era": "founders", "writerRank": 111, "notes": ""}, {"song": "Blood Count", "writer": "Billy Strayhorn", "performer": "Duke Ellington", "genre": "Jazz", "era": "founders", "writerRank": 111, "notes": ""}, {"song": "What Have You Done for Me Lately", "writer": "Jimmy Jam/Terry Lewis", "performer": "Janet Jackson", "genre": "Soul / R&B", "era": "modern", "writerRank": 94, "notes": ""}, {"song": "Control", "writer": "Jimmy Jam/Terry Lewis", "performer": "Janet Jackson", "genre": "Soul / R&B", "era": "modern", "writerRank": 94, "notes": ""}, {"song": "Stoned Soul Picnic", "writer": "Laura Nyro", "performer": "The 5th Dimension", "genre": "Soul / R&B", "era": "golden", "writerRank": 127, "notes": ""}, {"song": "Eli's Coming", "writer": "Laura Nyro", "performer": "Three Dog Night", "genre": "Soul / R&B", "era": "golden", "writerRank": 127, "notes": ""}, {"song": "Heart-Shaped Box", "writer": "Kurt Cobain", "performer": "Nirvana", "genre": "Rock", "era": "modern", "writerRank": 119, "notes": ""}, {"song": "Smells Like Teen Spirit", "writer": "Kurt Cobain", "performer": "Nirvana", "genre": "Rock", "era": "modern", "writerRank": 119, "notes": ""}, {"song": "Come as You Are", "writer": "Kurt Cobain", "performer": "Nirvana", "genre": "Rock", "era": "modern", "writerRank": 119, "notes": ""}, {"song": "Me and Bobby McGee", "writer": "Kris Kristofferson", "performer": "Janis Joplin", "genre": "Country", "era": "golden", "writerRank": 70, "notes": "Original: Roger Miller."}, {"song": "Help Me Make It Through the Night", "writer": "Kris Kristofferson", "performer": "Sammi Smith", "genre": "Country", "era": "golden", "writerRank": 70, "notes": "Original: Kris Kristofferson."}, {"song": "Sunday Mornin' Comin' Down", "writer": "Kris Kristofferson", "performer": "Johnny Cash", "genre": "Country", "era": "golden", "writerRank": 70, "notes": "Original: Ray Stevens."}, {"song": "There Is a Light", "writer": "Morrissey/Marr", "performer": "The Smiths", "genre": "Rock", "era": "modern", "writerRank": 66, "notes": "The file incorrectly lists writer type as wrote-for-others."}, {"song": "This Charming Man", "writer": "Morrissey/Marr", "performer": "The Smiths", "genre": "Rock", "era": "modern", "writerRank": 66, "notes": "The file incorrectly lists writer type as wrote-for-others."}, {"song": "How Soon Is Now?", "writer": "Morrissey/Marr", "performer": "The Smiths", "genre": "Rock", "era": "modern", "writerRank": 66, "notes": "The file incorrectly lists writer type as wrote-for-others."}, {"song": "Angel from Montgomery", "writer": "John Prine", "performer": "Bonnie Raitt", "genre": "Folk / Americana", "era": "golden", "writerRank": 70, "notes": "Original: John Prine."}, {"song": "White Christmas", "writer": "Irving Berlin", "performer": "Bing Crosby", "genre": "Songbook", "era": "founders", "writerRank": 54, "notes": ""}, {"song": "God Bless America", "writer": "Irving Berlin", "performer": "Kate Smith", "genre": "Songbook", "era": "founders", "writerRank": 54, "notes": ""}, {"song": "Puttin' on the Ritz", "writer": "Irving Berlin", "performer": "Fred Astaire", "genre": "Songbook", "era": "founders", "writerRank": 54, "notes": "Original: Harry Richman. The file incorrectly lists writer type as self."}, {"song": "Cheek to Cheek", "writer": "Irving Berlin", "performer": "Fred Astaire", "genre": "Songbook", "era": "founders", "writerRank": 54, "notes": "The file incorrectly lists writer type as self."}, {"song": "Night and Day", "writer": "Cole Porter", "performer": "Frank Sinatra", "genre": "Songbook", "era": "founders", "writerRank": 26, "notes": "Original: Fred Astaire."}, {"song": "Anything Goes", "writer": "Cole Porter", "performer": "Ethel Merman", "genre": "Songbook", "era": "founders", "writerRank": 26, "notes": ""}, {"song": "Begin the Beguine", "writer": "Cole Porter", "performer": "Artie Shaw", "genre": "Songbook", "era": "founders", "writerRank": 26, "notes": ""}, {"song": "I've Got You Under My Skin", "writer": "Cole Porter", "performer": "Frank Sinatra", "genre": "Songbook", "era": "founders", "writerRank": 26, "notes": "Original: Virginia Bruce."}, {"song": "Every Time We Say Goodbye", "writer": "Cole Porter", "performer": "Ella Fitzgerald", "genre": "Songbook", "era": "founders", "writerRank": 26, "notes": "Original: Nan Wynn."}, {"song": "Stormy Weather", "writer": "Harold Arlen", "performer": "Lena Horne", "genre": "Songbook", "era": "founders", "writerRank": 70, "notes": "Original: Ethel Waters."}, {"song": "Get Happy", "writer": "Harold Arlen", "performer": "Judy Garland", "genre": "Songbook", "era": "founders", "writerRank": 70, "notes": "Original: Ruth Etting."}, {"song": "Over the Rainbow", "writer": "Harold Arlen", "performer": "Judy Garland", "genre": "Songbook", "era": "founders", "writerRank": 70, "notes": ""}, {"song": "Come Rain or Come Shine", "writer": "Harold Arlen", "performer": "Ray Charles", "genre": "Songbook", "era": "founders", "writerRank": 70, "notes": "Original: Sy Oliver."}, {"song": "You'll Never Walk Alone", "writer": "Rodgers and Hammerstein", "performer": "Gerry and the Pacemakers", "genre": "Songbook", "era": "founders", "writerRank": 70, "notes": "Original: Christine Johnson."}, {"song": "Some Enchanted Evening", "writer": "Rodgers and Hammerstein", "performer": "Ezio Pinza", "genre": "Songbook", "era": "founders", "writerRank": 70, "notes": ""}, {"song": "My Favorite Things", "writer": "Rodgers and Hammerstein", "performer": "Julie Andrews", "genre": "Songbook", "era": "founders", "writerRank": 70, "notes": "Original: Mary Martin."}, {"song": "Send in the Clowns", "writer": "Stephen Sondheim", "performer": "Judy Collins", "genre": "Songbook", "era": "founders", "writerRank": 30, "notes": "Original: Glynis Johns."}, {"song": "Could It Be I'm Falling in Love", "writer": "Thom Bell", "performer": "The Spinners", "genre": "Soul / R&B", "era": "golden", "writerRank": 81, "notes": "Thom Bell \"Could It Be I'm Falling in Love\""}, {"song": "Betcha By Golly Wow", "writer": "Thom Bell", "performer": "The Stylistics", "genre": "Soul / R&B", "era": "golden", "writerRank": 81, "notes": "Thom Bell/Linda Creed \"Betcha By Golly Wow\" 1972"}, {"song": "I'll Be Around", "writer": "Thom Bell", "performer": "The Spinners", "genre": "Soul / R&B", "era": "golden", "writerRank": 81, "notes": "Thom Bell \"I'll Be Around\" 1972"}, {"song": "A House Is Not a Home", "writer": "Hal David", "performer": "Luther Vandross", "genre": "Soul / R&B", "era": "founders", "writerRank": 104, "notes": "Original: Dionne Warwick."}, {"song": "Alfie", "writer": "Hal David", "performer": "Cilla Black", "genre": "Soul / R&B", "era": "founders", "writerRank": 104, "notes": "\"Alfie\" same song as S0100; co-write Bacharach+David"}, {"song": "London Calling", "writer": "Joe Strummer", "performer": "The Clash", "genre": "Rock", "era": "golden", "writerRank": 139, "notes": ""}, {"song": "Spanish Bombs", "writer": "Joe Strummer", "performer": "The Clash", "genre": "Rock", "era": "golden", "writerRank": 139, "notes": ""}, {"song": "The Magnificent Seven", "writer": "Joe Strummer", "performer": "The Clash", "genre": "Rock", "era": "golden", "writerRank": 139, "notes": ""}, {"song": "Should I Stay or Should I Go", "writer": "Joe Strummer", "performer": "The Clash", "genre": "Rock", "era": "golden", "writerRank": 139, "notes": ""}, {"song": "Dear Mama", "writer": "Tupac Shakur", "performer": "2Pac", "genre": "Hip-Hop", "era": "modern", "writerRank": 119, "notes": ""}, {"song": "Changes", "writer": "Tupac Shakur", "performer": "2Pac", "genre": "Hip-Hop", "era": "modern", "writerRank": 119, "notes": ""}, {"song": "Smokestack Lightning", "writer": "Howlin Wolf", "performer": "Howlin' Wolf", "genre": "Blues", "era": "founders", "writerRank": 163, "notes": ""}, {"song": "Goodnight Irene", "writer": "Leadbelly", "performer": "The Weavers", "genre": "Blues", "era": "founders", "writerRank": 37, "notes": "Original: Lead Belly."}, {"song": "Midnight Special", "writer": "Leadbelly", "performer": "Creedence Clearwater Revival", "genre": "Blues", "era": "founders", "writerRank": 37, "notes": "Original: Lead Belly. The file incorrectly lists Lead Belly as writer; the song is a traditional folk song."}, {"song": "Cotton Fields", "writer": "Leadbelly", "performer": "Creedence Clearwater Revival", "genre": "Blues", "era": "founders", "writerRank": 37, "notes": "Original: Lead Belly."}, {"song": "Wish You Were Here", "writer": "Roger Waters", "performer": "Pink Floyd", "genre": "Rock", "era": "rise", "writerRank": 47, "notes": ""}, {"song": "Money", "writer": "Roger Waters", "performer": "Pink Floyd", "genre": "Rock", "era": "rise", "writerRank": 47, "notes": ""}, {"song": "Comfortably Numb", "writer": "Roger Waters", "performer": "Pink Floyd", "genre": "Rock", "era": "rise", "writerRank": 47, "notes": ""}, {"song": "I Can See Clearly Now", "writer": "Jimmy Cliff", "performer": "Johnny Nash", "genre": "Reggae", "era": "rise", "writerRank": 86, "notes": "Written+first recorded Johnny Nash 1972. INPUT CREDITS JIMMY CLIFF - LIKELY WRONG WRITER, Cliff is 1993 cover. VERIFY."}, {"song": "Sultans of Swing", "writer": "Mark Knopfler", "performer": "Dire Straits", "genre": "Rock", "era": "golden", "writerRank": 86, "notes": "Writer Mark Knopfler performed this as the frontman of Dire Straits."}, {"song": "Telegraph Road", "writer": "Mark Knopfler", "performer": "Dire Straits", "genre": "Rock", "era": "golden", "writerRank": 86, "notes": "Writer Mark Knopfler performed this as the frontman of Dire Straits."}, {"song": "Brothers in Arms", "writer": "Mark Knopfler", "performer": "Dire Straits", "genre": "Rock", "era": "golden", "writerRank": 86, "notes": "Writer Mark Knopfler performed this as the frontman of Dire Straits."}, {"song": "Mr. Blue Sky", "writer": "Jeff Lynne", "performer": "Electric Light Orchestra", "genre": "Pop", "era": "golden", "writerRank": 104, "notes": "Writer Jeff Lynne performed this as the frontman of Electric Light Orchestra."}, {"song": "Handle with Care", "writer": "Jeff Lynne", "performer": "Traveling Wilburys", "genre": "Pop", "era": "golden", "writerRank": 104, "notes": "\"Handle with Care\" 1988"}, {"song": "Hurt", "writer": "Trent Reznor", "performer": "Johnny Cash", "genre": "Rock", "era": "modern", "writerRank": 139, "notes": "\"Hurt\" NIN 1994 original, Cash 2002 cover; contested best-known"}, {"song": "Viva Las Vegas", "writer": "Mort Shuman", "performer": "Elvis Presley", "genre": "Pop", "era": "rise", "writerRank": 160, "notes": "Pomus/Shuman \"Viva Las Vegas\" 1964"}, {"song": "Teenager in Love", "writer": "Mort Shuman", "performer": "Dion & the Belmonts", "genre": "Pop", "era": "rise", "writerRank": 160, "notes": "Pomus/Shuman \"A Teenager in Love\" 1959"}, {"song": "Save the Last Dance for Me", "writer": "Mort Shuman", "performer": "The Drifters", "genre": "Pop", "era": "rise", "writerRank": 160, "notes": "\"Save the Last Dance\" same song as S0315"}, {"song": "Every Breath You Take", "writer": "Sting", "performer": "The Police", "genre": "Pop", "era": "golden", "writerRank": 47, "notes": "Writer Sting performed this as the frontman of The Police."}, {"song": "Roxanne", "writer": "Sting", "performer": "The Police", "genre": "Pop", "era": "golden", "writerRank": 47, "notes": "Writer Sting performed this as the frontman of The Police."}, {"song": "Hickory Wind", "writer": "Gram Parsons", "performer": "The Byrds", "genre": "Country", "era": "golden", "writerRank": 104, "notes": "Writer Gram Parsons joined The Byrds and recorded this for their Sweetheart of the Rodeo album."}, {"song": "Fight the Power", "writer": "Chuck D", "performer": "Public Enemy", "genre": "Hip-Hop", "era": "modern", "writerRank": 139, "notes": "Writer Chuck D performed this as the frontman of Public Enemy."}, {"song": "Precious Lord Take My Hand", "writer": "Thomas A. Dorsey", "performer": "Mahalia Jackson", "genre": "Gospel", "era": "founders", "writerRank": 30, "notes": "Original: Thomas A. Dorsey."}, {"song": "Peace in the Valley", "writer": "Thomas A. Dorsey", "performer": "Red Foley", "genre": "Gospel", "era": "founders", "writerRank": 30, "notes": "Original: Mahalia Jackson. The file incorrectly lists writer type as self; Dorsey wrote this for Mahalia Jackson."}, {"song": "Thing Called Love", "writer": "John Hiatt", "performer": "Bonnie Raitt", "genre": "Folk / Americana", "era": "golden", "writerRank": 111, "notes": "Original: John Hiatt."}, {"song": "A Life in the Day of Benjamin Andre", "writer": "Andre 3000", "performer": "Outkast", "genre": "Hip-Hop", "era": "modern", "writerRank": 119, "notes": "Writer Andre 3000 performed this as a member of Outkast."}, {"song": "B.O.B.", "writer": "Andre 3000", "performer": "Outkast", "genre": "Hip-Hop", "era": "modern", "writerRank": 119, "notes": "Writer Andre 3000 performed this as a member of Outkast."}, {"song": "Ms. Jackson", "writer": "Andre 3000", "performer": "Outkast", "genre": "Hip-Hop", "era": "modern", "writerRank": 119, "notes": "Writer Andre 3000 performed this as a member of Outkast."}, {"song": "Hey Ya!", "writer": "Andre 3000", "performer": "Outkast", "genre": "Hip-Hop", "era": "modern", "writerRank": 119, "notes": "Writer Andre 3000 performed this as a member of Outkast."}, {"song": "Pancho and Lefty", "writer": "Townes Van Zandt", "performer": "Willie Nelson & Merle Haggard", "genre": "Country", "era": "golden", "writerRank": 127, "notes": "Original: Townes Van Zandt. \"Pancho and Lefty\" Townes 1972, Nelson/Haggard 1983 #1 Country"}, {"song": "If I Needed You", "writer": "Townes Van Zandt", "performer": "Emmylou Harris & Don Williams", "genre": "Country", "era": "golden", "writerRank": 127, "notes": "Original: Townes Van Zandt. \"If I Needed You\" Townes 1972, Harris/Williams duet 1981"}, {"song": "Jesus Etc", "writer": "Jeff Tweedy", "performer": "Wilco", "genre": "Folk / Americana", "era": "modern", "writerRank": 149, "notes": "Written by Tweedy and Jay Bennett."}, {"song": "L.A. Freeway", "writer": "Guy Clark", "performer": "Jerry Jeff Walker", "genre": "Country", "era": "golden", "writerRank": 164, "notes": "Writer Guy Clark released his own recording in 1975."}];
+// Live ranking-question generator. Produces fair "who ranked higher" matchups
+// from the artist data, fresh each session, so they can't be memorized.
+// Each generated question is a 2-option ranking with data-built descriptions.
+//
+// Fairness rules (from the design constraints):
+//  - the two artists must differ in rank by at least MIN_GAP (defensible, not arguable)
+//  - EXCEPTION: "upset" pairs (one strongly under-recognized, one over-recognized)
+//    are allowed closer, because the surprise is the point and the reveal explains it
+//  - descriptions come only from data fields (no invented facts)
+//  - the answer is always the genuinely higher-ranked artist
+
+const RANK_GEN = (function(){
+  const CURATED_PAIRS = [{"a": "Chuck Berry", "b": "Billy Joel", "answer": "Chuck Berry", "reveal": "The book places Chuck Berry well above Billy Joel. It's about who built the thing: Berry drew the map that rock and roll was drawn on, and Joel wrote beautifully within it. Both are among the 164 the book counts as the greatest; Berry simply got there first.", "eyebrow": "This book ranks 164 legendary songwriters. Two of them, head to head.", "story": "This book measures who actually built the music, not who got most famous. One of these two invented the blueprint for rock and roll in the 1950s, the guitar sound and storytelling everyone copied. The other is a beloved piano man who wrote great songs a generation later, working inside the world the first one made.", "locator": "Berry is near the top of the Rock chapter; Joel is in the Pop chapter."}, {"a": "Hank Williams", "b": "Johnny Cash", "answer": "Hank Williams", "reveal": "The book ranks Hank Williams much higher, near the very top of the whole book. Johnny Cash is a giant, but the book measures the songwriting itself, and Williams compressed more into a country song than almost anyone before or since. Founding beats fame here.", "eyebrow": "Two giants of country. The book separates them clearly.", "story": "One of these two basically invented modern country songwriting, writing 29 songs in his last two years before dying at 29, songs people still record today. The other is one of the most beloved figures in all of music, a star who built on the foundation the first one laid.", "locator": "Both are in the Country chapter; Williams sits near the very top."}, {"a": "Robert Johnson", "b": "Muddy Waters", "answer": "Robert Johnson", "reveal": "The book ranks Robert Johnson much higher. Muddy Waters is a titan, but Johnson got there first and packed so much into those 29 songs that everyone after, including Muddy, was building on him. The book rewards who broke the ground.", "eyebrow": "Two blues legends. One came first and changed everything.", "story": "Both of these men are blues legends. But one of them, in just two recording sessions in the 1930s, transformed how the guitar was played, making it a second voice, before dying at 27. The other built the electric Chicago blues two decades later, on top of what the first one started.", "locator": "Both are in the Blues chapter; Johnson sits far higher."}, {"a": "Ray Charles", "b": "Sam Cooke", "answer": "Ray Charles", "reveal": "The book ranks Ray Charles much higher, near the very top. Sam Cooke was a genius too, but Charles invented the form they both worked in. When you measure who built the music, the founder wins.", "eyebrow": "Two founders of soul. The book still picks one over the other.", "story": "Both of these men helped invent soul music. But one of them did something no one had: in 1954 he took gospel music and pointed it at love and desire instead of God, and that one move became the foundation of soul itself. The other was a brilliant soul singer and writer who came up in the world the first one made.", "locator": "Both are in the Soul & R&B chapter; Charles sits near the very top."}];
+
+  const SEG = {
+    A:'a founder of the genre',
+    I:'a major innovator',
+    C:'a master craftsman',
+    S:'a distinctive stylist',
+    V:'a bold original'
+  };
+  const MIN_GAP = 15;          // fair questions need this much rank separation
+  const UPSET_GAP_MIN = 20;    // an upset needs a real fame-vs-rank tension
+
+  function startDecade(years){
+    const m = String(years).match(/(\d{4})/);
+    if(!m) return null;
+    return m[1].slice(0,3)+'0s';
+  }
+  // a short, honest, data-only descriptor
+  function disp(a){ return a.display || a.name; }
+  // Turn Best_Known_For into a clean standalone sentence introducing the artist.
+  // e.g. "(Nile Rodgers is the guitarist behind Chic and "Le Freak".)"
+  // SHORT inline identifier for use in the question STORY (so players can reason before answering).
+  // e.g. "Joe Strummer (of The Clash)" or "Burt Bacharach (who wrote Walk On By)"
+  function balanceQuotes(s){ return ((s.match(/"/g)||[]).length%2!==0) ? s.replace(/"/g,'') : s; }
+  function cap(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
+  // identifier as a TAIL phrase (no parentheses), for weaving into prose:
+  // "who wrote \"Night and Day\"" / "of The Clash" / "known for \"Criminal\""
+  function idTail(a){
+    let k=(a.knownFor||'').trim();
+    if(!k) return '';
+    const unq=k.replace(/^"|"$/g,'').trim();
+    const dl=disp(a).toLowerCase().replace(/^the\s+/,'');
+    if(/^(wrote|co-wrote|produced)/i.test(unq)){
+      let u=unq; if((u.match(/"/g)||[]).length%2!==0) u=u.replace(/"/g,'');
+      return `who ${u}`;
+    }
+    if(/composer$/i.test(unq)){
+      let title=unq.replace(/\s*composer$/i,'').replace(/^"|"$/g,'').trim();
+      return `who wrote "${title}"`;
+    }
+    if(/^the\s+\w+\s+of\s/i.test(unq)) return unq; // already a descriptor
+    if(/^the\s+[A-Z]/i.test(unq) && !/\sof\s/i.test(unq)){
+      const ul=unq.toLowerCase().replace(/^the\s+/,'');
+      if(ul===dl) return '';
+      return `of ${unq}`;
+    }
+    let kk=k; if((kk.match(/"/g)||[]).length%2!==0) kk=kk.replace(/"/g,'');
+    if(kk.toLowerCase().replace(/^the\s+/,'')===dl) return '';
+    return `known for ${kk}`;
+  }
+  function inlineId(a){
+    let k=(a.knownFor||'').trim();
+    if(!k) return disp(a);
+    const unq=k.replace(/^"|"$/g,'').trim();
+    if(/^(wrote|co-wrote|produced)/i.test(unq)){
+      let u=unq; if((u.match(/"/g)||[]).length%2!==0) u=u.replace(/"/g,'');
+      return `${disp(a)} (who ${u})`;
+    }
+    if(/composer$/i.test(unq)){
+      let title=unq.replace(/\s*composer$/i,'').replace(/^"|"$/g,'').trim();
+      return `${disp(a)} (who wrote "${title}")`;
+    }
+    if(/^the\s+\w+\s+of\s/i.test(unq)) return `${disp(a)} (${unq})`;
+    // band name
+    if(/^the\s+[A-Z]/i.test(unq) && !/\sof\s/i.test(unq)){
+      const dl=disp(a).toLowerCase().replace(/^the\s+/,''); const ul=unq.toLowerCase().replace(/^the\s+/,'');
+      if(ul===dl) return disp(a);
+      return `${disp(a)} (of ${unq})`;
+    }
+    // bare song/title
+    let kk=k; if((kk.match(/"/g)||[]).length%2!==0) kk=kk.replace(/"/g,'');
+    // suppress if the hook just echoes the artist's name (e.g. "Rolling Stones" for the Rolling Stones)
+    const dispLower=disp(a).toLowerCase().replace(/^the\s+/,'');
+    if(kk.toLowerCase().replace(/^the\s+/,'')===dispLower) return disp(a);
+    return `${disp(a)} (known for ${kk})`;
+  }
+  function knownForSentence(a){
+    let k = (a.knownFor||'').trim();
+    if(!k) return '';
+    const who = disp(a);
+    let out;
+    const unq = k.replace(/^"|"$/g,'').trim();
+    if(/^(wrote|co-wrote|produced|led|founded|sang|recorded)/i.test(unq)) out = `${who} ${unq}.`;
+    else if(/composer$/i.test(unq)){
+      let title = unq.replace(/\s*composer$/i,'').replace(/^"|"$/g,'').trim();
+      out = `${who} composed "${title}".`;
+    }
+    else if(/^the\s+\w+\s+of\s/i.test(unq)) out = `${who} is known as ${unq}.`;
+    // "Band, \"Song\"" -> "played with Band, known for \"Song\""
+    else if(/^the?\s*[A-Z].*,\s*"/.test(k)){
+      const parts = k.split(/,\s*/);
+      const band = parts[0].trim();
+      const song = parts.slice(1).join(', ').replace(/^"|"$/g,'').trim();
+      out = `${who} played with ${band}, known for "${song}".`;
+    }
+    else if(/^the\s+[A-Z]/i.test(unq) && !/\sof\s/i.test(unq)) out = `${who} played with ${unq}.`;
+    else if(/&|\band\b/.test(unq) && !/"/.test(k) && unq.split(/\s+/).length<=4) out = `${who} recorded as ${unq}.`;
+    else out = `That's ${who}, known for ${k}.`;
+    // final safety: balance quotes so we never emit an orphan
+    if((out.match(/"/g)||[]).length % 2 !== 0) out = out.replace(/"/g,'');
+    return ' '+out;
+  }
+  // pick which artist in the pair is the "less famous" one (lower streaming presence),
+  // to attach the recognition hook where it helps most
+  function lessFamiliar(x,y){
+    const sx = x.spotify||x.lastfm||0, sy = y.spotify||y.lastfm||0;
+    return sx <= sy ? x : y;
+  }
+  // format a listener count like 16.1M or 890K
+  function fmtListeners(n){
+    if(n>=1e6) return (n/1e6).toFixed(n>=1e7?0:1)+' million';
+    if(n>=1e3) return Math.round(n/1e3)+' thousand';
+    return String(Math.round(n));
+  }
+  // Build the concrete listening line. Returns null if data missing or direction is wrong.
+  // higher = the higher-RANKED artist; lower = the lower-ranked one.
+  // The line only lands when the higher-ranked artist is streamed LESS (the real upset).
+  function listeningLine(higher, lower){
+    // prefer Spotify monthly listeners; fall back to Last.fm
+    let h = higher.spotify, l = lower.spotify, src = 'stream';
+    if(!(h>0 && l>0)){ h = higher.lastfm; l = lower.lastfm; src = 'listen to'; }
+    if(!(h>0 && l>0)) return null;            // no data -> caller uses fallback
+    if(h >= l) return {agree:true, h, l, src}; // higher-ranked is ALSO more popular -> not an upset
+    const ratio = l / h;
+    // Sanity cap: a ratio above ~10x usually means we're comparing a streaming-era star
+    // against a pre-streaming figure who is barely on the platform. Citing "6000x" reads as
+    // a data glitch and hurts credibility. Above the cap, don't use a numeric reveal at all.
+    if(ratio > 10) return null;
+    let comparison;
+    if(ratio >= 1.5) comparison = `${ratio.toFixed(1)} times as much`;
+    else comparison = `noticeably more`;
+    return { agree:false, ratio, comparison, src,
+             hWho:disp(higher), lWho:disp(lower) };
+  }
+  function describe(a){
+    const role = SEG[a.seg] || 'a notable writer';
+    const era = startDecade(a.years);
+    const base = era ? `${role} in ${a.genre}, working from the ${era}` : `${role} in ${a.genre}`;
+    // append a concrete identifier so an unfamiliar name is still reason-able
+    const id = balanceQuotes(identifierClause(a));
+    return id ? `${base} ${id}` : base;
+  }
+  // produce a short "(known for X)" style clause for use inside describe()
+  function identifierClause(a){
+    let k=(a.knownFor||'').trim();
+    if(!k) return '';
+    const unq=k.replace(/^"|"$/g,'').trim();
+    const dl=disp(a).toLowerCase().replace(/^the\s+/,'');
+    if(/^(wrote|co-wrote|produced)/i.test(unq)){
+      let u=unq; if((u.match(/"/g)||[]).length%2!==0) u=u.replace(/"/g,'');
+      return `(${a.knownFor && /^produced/i.test(unq)?'who '+u:'who '+u})`;
+    }
+    if(/composer$/i.test(unq)){
+      let title=unq.replace(/\s*composer$/i,'').replace(/^"|"$/g,'').trim();
+      return `(who wrote "${title}")`;
+    }
+    if(/^the\s+\w+\s+of\s/i.test(unq)) return `(${unq})`;
+    if(/^the\s+[A-Z]/i.test(unq) && !/\sof\s/i.test(unq)){
+      const ul=unq.toLowerCase().replace(/^the\s+/,'');
+      if(ul===dl) return '';
+      return `(of ${unq})`;
+    }
+    let kk=k; if((kk.match(/"/g)||[]).length%2!==0) kk=kk.replace(/"/g,'');
+    if(kk.toLowerCase().replace(/^the\s+/,'')===dl) return '';
+    return `(known for ${kk})`;
+  }
+  // a few interchangeable phrasings so 200 plays don't read identically
+  const FAIR_OPENERS = [
+    'This book measures who actually built the music, not who got most famous.',
+    'This book ranks writers by what they built, not by how famous they got.',
+    'Fame and craft are different things in this book. It scores the building.'
+  ];
+  const FAIR_CLOSERS = [
+    'Think about who broke newer ground.',
+    'Ask yourself who came first and changed the most.',
+    'One of them opened a door the other walked through.'
+  ];
+  function rpick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  // is this artist a "famous but lower-ranked" type? (big negative gap = over-recognized)
+  // gap here = RecognitionGap (book minus institutions). Positive = book ranks ABOVE the halls.
+  function isUnderRecognized(a){ return a.gap >= 60; }   // book champions them
+  function isOverRecognized(a){ return a.gap <= -60; }   // famous, book ranks low
+
+  // pick a FAIR pair: big rank gap, both have real songs/recognizability
+  function fairPair(pool){
+    for(let tries=0; tries<60; tries++){
+      const x = pool[Math.floor(Math.random()*pool.length)];
+      const y = pool[Math.floor(Math.random()*pool.length)];
+      if(x.name===y.name) continue;
+      if(Math.abs(x.rank - y.rank) < MIN_GAP) continue;
+      // avoid two people who'd be confusable as the "same" answer; require different ranks
+      if(x.rank === y.rank) continue;
+      return [x,y];
+    }
+    return null;
+  }
+  // pick an UPSET pair: one under-recognized (book loves) vs one over-recognized (famous, ranked low)
+  function upsetPair(pool){
+    const under = pool.filter(isUnderRecognized);
+    const over  = pool.filter(isOverRecognized);
+    if(!under.length || !over.length) return null;
+    for(let tries=0; tries<40; tries++){
+      const u = under[Math.floor(Math.random()*under.length)];
+      const o = over[Math.floor(Math.random()*over.length)];
+      if(u.name===o.name) continue;
+      // the under-recognized one should actually rank higher (lower number) for the upset to land
+      if(u.rank >= o.rank) continue;
+      return [u,o];
+    }
+    return null;
+  }
+
+  function genFair(pool){
+    // ~1 in 8 ranking questions: use a hand-written curated matchup (with its custom reveal),
+    // so these appear rarely and never in a predictable cycle.
+    if(CURATED_PAIRS && CURATED_PAIRS.length && Math.random() < 0.13){
+      const c = CURATED_PAIRS[Math.floor(Math.random()*CURATED_PAIRS.length)];
+      const hi = pool.find(a => disp(a)===c.a || a.name===c.a);
+      const lo = pool.find(a => disp(a)===c.b || a.name===c.b);
+      if(hi && lo){
+        return {
+          kind:'ranked higher', generated:true,
+          genre:hi.genre, era:startDecade(hi.years),
+          eyebrow:c.eyebrow, story:c.story,
+          ask:`Who does the book rank higher: ${c.a} or ${c.b}?`,
+          answer:c.answer,
+          options: Math.random()<0.5 ? [c.a, c.b] : [c.b, c.a],
+          reveal:c.reveal, locator:c.locator
+        };
+      }
+    }
+
+    const pair = fairPair(pool);
+    if(!pair) return null;
+    const [x,y] = pair;
+    const higher = x.rank < y.rank ? x : y;   // lower rank number = higher position
+    const lower  = x.rank < y.rank ? y : x;
+    return {
+      kind:'ranked higher',
+      generated:true,
+      eyebrow:`This book ranks 164 legendary songwriters. Two of them, head to head.`,
+      story:`${rpick(FAIR_OPENERS)} One of these is ${describe(higher)}. `+
+            `The other is ${describe(lower)}. ${rpick(FAIR_CLOSERS)}`,
+      ask:`Who does the book rank higher: ${disp(higher)} or ${disp(lower)}?`,
+      answer:disp(higher),
+      options: Math.random()<0.5 ? [disp(higher), disp(lower)] : [disp(lower), disp(higher)],
+      reveal:(function(){
+        const L = listeningLine(higher, lower);
+        if(L && !L.agree){
+          return `The book places ${disp(higher)} above ${disp(lower)}, `+
+                 `even though people ${L.src} ${disp(lower)} ${L.comparison}.`+
+                 knownForSentence(lessFamiliar(higher,lower))+
+                 ` The book scores who built the music, not who racks up the most plays.`;
+        }
+        if(L && L.agree){
+          return `The book places ${disp(higher)} above ${disp(lower)}, and here the crowd agrees: `+
+                 `people ${L.src} ${disp(higher)} more too.`+knownForSentence(lessFamiliar(higher,lower))+
+                 ` Sometimes the one who built the music is also the one people keep coming back to.`;
+        }
+        return `The book places ${disp(higher)} above ${disp(lower)}.`+knownForSentence(lessFamiliar(higher,lower))+
+               ` It's about who built the music others worked inside, and ${disp(higher)} got there first.`;
+      })(),
+      locator:`Both are among the 164 in the book; the book places ${disp(higher)} ahead here.`
+    };
+  }
+
+  function genUpset(pool){
+    const pair = upsetPair(pool);
+    if(!pair) return null;
+    const [u,o] = pair;   // u = under-recognized (ranks higher), o = over-recognized famous
+    return {
+      kind:'the upset',
+      generated:true,
+      eyebrow:`Trust your gut: who do you think this book ranks higher?`,
+      story:(function(){
+        const id = identifierClause(u);
+        const tail = id ? ` The lesser-known one here is ${disp(u)} ${id}.` : '';
+        return `One of these is a famous, much-celebrated name. The other is less of a household name today. `+
+               `But this book ranks by who built the music, not who sold the most records, `+
+               `and it often lands in surprising places.`+tail;
+      })(),
+      ask:`Who does the book rank higher: ${disp(o)} or ${disp(u)}?`,
+      answer:disp(u),
+      options: Math.random()<0.5 ? [disp(u), disp(o)] : [disp(o), disp(u)],
+      reveal:(function(){
+        const L = listeningLine(u, o);
+        if(L && !L.agree){
+          return `Surprise: the book places ${disp(u)} above ${disp(o)}, `+
+                 `even though people ${L.src} ${disp(o)} ${L.comparison}.`+knownForSentence(lessFamiliar(u,o))+
+                 ` That gap between what gets played and who actually built the music is the argument of the whole book.`;
+        }
+        return `Surprise: the book places ${disp(u)} above ${disp(o)}.`+knownForSentence(lessFamiliar(u,o))+
+               ` Fame and songwriting are different things, and the book measures the writing itself.`;
+      })(),
+      locator:`Both are among the 164 in the book; the book places ${disp(u)} ahead of the more famous name here.`
+    };
+  }
+
+
+  // ===== REVERSE QUESTION: who gets more Spotify listens? =====
+  // The trap that teaches: the famous one usually wins on streams, but the book often
+  // ranks the OTHER one higher. Player is "right" on streams, then learns the gap.
+  function genSpotify(pool){
+    const withSp = pool.filter(a => a.spotify > 0);
+    for(let t=0;t<60;t++){
+      const x = withSp[Math.floor(Math.random()*withSp.length)];
+      const y = withSp[Math.floor(Math.random()*withSp.length)];
+      if(x.name===y.name) continue;
+      const ratio = Math.max(x.spotify,y.spotify)/Math.min(x.spotify,y.spotify);
+      if(ratio < 1.4 || ratio > 10) continue;   // need a clear winner, but not absurd
+      const moreStreamed = x.spotify > y.spotify ? x : y;
+      const lessStreamed = x.spotify > y.spotify ? y : x;
+      // the interesting case: the MORE-streamed one is ranked LOWER by the book
+      const bookFavorsOther = moreStreamed.rank > lessStreamed.rank;
+      return {
+        kind:'spotify',
+        generated:true,
+        eyebrow:`Forget the book for a second. This is about raw popularity.`,
+        story:`Set aside who "built" what. Right now, today, one of these two is played a lot more `+
+              `on Spotify than the other. Just go with your gut on who the crowd streams more.`,
+        ask:`Who gets more Spotify listeners: ${disp(x)} or ${disp(y)}?`,
+        answer:disp(moreStreamed),
+        options: Math.random()<0.5 ? [disp(x), disp(y)] : [disp(y), disp(x)],
+        reveal:(function(){
+          const r = ratio>=1.5 ? ratio.toFixed(1)+' times as many' : 'more';
+          let base = `${disp(moreStreamed)} gets ${r} monthly listeners.`;
+          if(bookFavorsOther){
+            return base + ` But here's the twist: the book ranks ${disp(lessStreamed)} higher anyway.`+
+                   knownForSentence(lessFamiliar(moreStreamed,lessStreamed))+
+                   ` More plays doesn't mean more built. That gap is the whole argument.`;
+          }
+          return base + ` And the book agrees here, ranking ${disp(moreStreamed)} higher too.`+
+                 ` Sometimes the crowd and the craft line up.`;
+        })(),
+        locator:`Both are among the 164 in the book.`
+      };
+    }
+    return null;
+  }
+
+  // ===== SONGCRAFT-ONLY: ranked on writing alone, ignoring who founded what =====
+  // Uses Songcraft_Rank (SI stripped out). Best on "flip" pairs where the answer
+  // changes vs the overall ranking — shows the SI weighting is a deliberate choice.
+  function genSongcraft(pool){
+    const withCraft = pool.filter(a => a.craftRank > 0);
+    // prefer pairs that FLIP (higher overall != higher on craft) and have a real craft gap
+    let best=null;
+    for(let t=0;t<80;t++){
+      const x = withCraft[Math.floor(Math.random()*withCraft.length)];
+      const y = withCraft[Math.floor(Math.random()*withCraft.length)];
+      if(x.name===y.name) continue;
+      if(Math.abs(x.craftRank - y.craftRank) < 15) continue;  // fair craft gap
+      const craftHigher = x.craftRank < y.craftRank ? x : y;
+      const craftLower  = x.craftRank < y.craftRank ? y : x;
+      const overallHigher = x.rank < y.rank ? x : y;
+      const flips = craftHigher.name !== overallHigher.name;
+      const cand = {x,y,craftHigher,craftLower,flips};
+      if(flips){ best=cand; break; }      // a flip is ideal, take it
+      if(!best) best=cand;                // otherwise hold a non-flip as fallback
+    }
+    if(!best) return null;
+    const {craftHigher,craftLower,flips} = best;
+    return {
+      kind:'songcraft',
+      generated:true,
+      eyebrow:`A different question. Not who founded the most. Who WROTE the best.`,
+      story:`The book's main ranking rewards the people who invented whole kinds of music. `+
+            `But it also scores pure songwriting on its own, setting aside who founded what. `+
+            `On craft alone, the melodies, the words, the structure, which of these ranks higher?`,
+      ask:`On songwriting craft alone, who ranks higher: ${disp(craftHigher)} or ${disp(craftLower)}?`,
+      answer:disp(craftHigher),
+      options: Math.random()<0.5 ? [disp(craftHigher), disp(craftLower)] : [disp(craftLower), disp(craftHigher)],
+      reveal:(function(){
+        if(flips){
+          return `On craft alone, the book ranks ${disp(craftHigher)} higher.`+
+                 knownForSentence(lessFamiliar(craftHigher,craftLower))+
+                 ` Here's what's interesting: in the main ranking, it's the other way around, because `+
+                 `${disp(craftLower)} gets credit for founding something. Strip that away and look at pure writing, and ${disp(craftHigher)} comes out on top. `+
+                 `That's the choice the book is making, shown in the open.`;
+        }
+        return `On craft alone, the book ranks ${disp(craftHigher)} higher.`+
+               knownForSentence(lessFamiliar(craftHigher,craftLower))+
+               ` This is the writing measured on its own, apart from who founded what.`;
+      })(),
+      locator:`Each card in the book shows this craft score as a donut, so you can see both rankings.`
+    };
+  }
+
+
+  // ===== GRAMMY SONG OF THE YEAR: which one won? =====
+  // The Grammy that goes to the WRITER. Surprising because many giants never won it.
+  function genGrammy(pool){
+    const winners = pool.filter(a => a.sotyWins > 0);
+    const nonwinners = pool.filter(a => a.sotyWins === 0 && (a.spotify>0 || a.lastfm>0));
+    if(!winners.length || !nonwinners.length) return null;
+    for(let t=0;t<40;t++){
+      const w = winners[Math.floor(Math.random()*winners.length)];
+      // pick a non-winner who is FAMOUS (so the surprise lands: "wait, THEY never won?")
+      const n = nonwinners[Math.floor(Math.random()*nonwinners.length)];
+      if(w.name===n.name) continue;
+      return {
+        kind:'grammy',
+        generated:true,
+        eyebrow:`The Grammy for Song of the Year goes to the writer, not the singer.`,
+        story:(function(){
+          const tw = balanceQuotes(idTail(w)), tn = balanceQuotes(idTail(n));
+          let intro = '';
+          if(tw && tn) intro = `Two writers here, both behind songs you know: ${disp(w)}, ${tw}, and ${disp(n)}, ${tn}. `;
+          else if(tw) intro = `A quick handle on the less familiar name: ${disp(w)}, ${tw}. `;
+          else if(tn) intro = `A quick handle on the less familiar name: ${disp(n)}, ${tn}. `;
+          return intro + `Song of the Year is the one big Grammy that rewards the person who wrote the song, not the singer. `+
+                 `Plenty of legendary writers never won it. One of these two did, and the other never has.`;
+        })(),
+        ask:`Which one won the Grammy for Song of the Year: ${disp(w)} or ${disp(n)}?`,
+        answer:disp(w),
+        options: Math.random()<0.5 ? [disp(w), disp(n)] : [disp(n), disp(w)],
+        reveal:(function(){
+          const times = w.sotyWins>1 ? `${w.sotyWins} times` : 'once';
+          return `It was ${disp(w)}, who won ${times}.`+knownForSentence(lessFamiliar(w,n))+
+                 ` Here's the surprise: ${disp(n)} never won Song of the Year at all. `+
+                 `The award and the lasting greatness don't always match, which is what this book is about.`;
+        })(),
+        locator:`Song of the Year wins are tracked for every writer in the book.`
+      };
+    }
+    return null;
+  }
+
+  // ===== HALL OF FAME: which one is in? (often the surprise is who is NOT) =====
+  function genHall(pool){
+    // use Rock Hall; pick one IN and one OUT, where the OUT one is famous (the surprise)
+    const inHall = pool.filter(a => a.inRRHOF && (a.spotify>0||a.lastfm>0));
+    const outHall = pool.filter(a => !a.inRRHOF && (a.spotify>0||a.lastfm>0));
+    if(!inHall.length || !outHall.length) return null;
+    for(let t=0;t<40;t++){
+      const i = inHall[Math.floor(Math.random()*inHall.length)];
+      const o = outHall[Math.floor(Math.random()*outHall.length)];
+      if(i.name===o.name) continue;
+      return {
+        kind:'hall',
+        generated:true,
+        eyebrow:`The Rock and Roll Hall of Fame has let some in, and left some out.`,
+        story:(function(){
+          const ti = balanceQuotes(idTail(i)), to = balanceQuotes(idTail(o));
+          let intro = '';
+          if(ti && to) intro = `To place them: ${disp(i)}, ${ti}, and ${disp(o)}, ${to}. `;
+          else if(ti) intro = `To place the less familiar name: ${disp(i)}, ${ti}. `;
+          else if(to) intro = `To place the less familiar name: ${disp(o)}, ${to}. `;
+          return intro + `The Rock and Roll Hall of Fame is supposed to honor the greats, but it has some surprising gaps. `+
+                 `One of these two is in it. The other, somehow, is not.`;
+        })(),
+        ask:`Which one is in the Rock and Roll Hall of Fame: ${disp(i)} or ${disp(o)}?`,
+        answer:disp(i),
+        options: Math.random()<0.5 ? [disp(i), disp(o)] : [disp(o), disp(i)],
+        reveal:`It's ${disp(i)} who's in the Hall.`+knownForSentence(lessFamiliar(i,o))+
+               ` The surprise is that ${disp(o)} is not, an omission a lot of people would argue with. `+
+               `This book argues that halls of fame miss things, which is exactly why it exists.`,
+        locator:`Hall of Fame status is recorded for every writer in the book.`
+      };
+    }
+    return null;
+  }
+
+  // ===== WITHIN A GENRE: who ranks higher in their shared genre? =====
+  // Tighter than the overall ranking: same genre, uses Genre_SubRank.
+  function genGenre(pool){
+    // group by genre, find a pair in the same genre with a clear subrank gap
+    for(let t=0;t<80;t++){
+      const x = pool[Math.floor(Math.random()*pool.length)];
+      const sameGenre = pool.filter(a => a.genre===x.genre && a.name!==x.name && a.subRank>0);
+      if(!sameGenre.length || !x.subRank) continue;
+      const y = sameGenre[Math.floor(Math.random()*sameGenre.length)];
+      if(Math.abs(x.subRank - y.subRank) < 4) continue;   // need a clear gap within the genre
+      const higher = x.subRank < y.subRank ? x : y;
+      const lower  = x.subRank < y.subRank ? y : x;
+      return {
+        kind:'genre',
+        generated:true,
+        eyebrow:`Same genre. Head to head. Who does the book rank higher?`,
+        story:`Both of these built their music in ${x.genre}. The book ranks every writer within their own genre, `+
+              `as well as overall. Within ${x.genre}, one of these two ranks clearly higher.`,
+        ask:`Within ${x.genre}, who ranks higher: ${disp(higher)} or ${disp(lower)}?`,
+        answer:disp(higher),
+        options: Math.random()<0.5 ? [disp(higher), disp(lower)] : [disp(lower), disp(higher)],
+        reveal:`Within ${x.genre}, the book places ${disp(higher)} higher.`+knownForSentence(lessFamiliar(higher,lower))+
+               ` It's a way to compare like with like, the ${x.genre} builders against each other, not against every other kind of music.`,
+        locator:`Each card shows the writer's rank within their genre.`
+      };
+    }
+    return null;
+  }
+
+
+  // ===== CATALOG DEPTH: whose songs were covered more by other artists? =====
+  // Uses SecondHandSongs cover counts, but ONLY where confidence is reliable (MED/HIGH).
+  // This automatically excludes hip-hop, where "covers" doesn't capture the form
+  // (the data itself flags those counts LOW). Covers measure how much a writer's
+  // catalog became raw material for OTHER performers -- a pure influence signal.
+  function genCovers(pool){
+    const RELIABLE = new Set(['HIGH','MED-HIGH','MED']);
+    const withCovers = pool.filter(a => a.covers > 0 && RELIABLE.has(a.coverConf));
+    if(withCovers.length < 2) return null;
+    for(let t=0;t<60;t++){
+      const x = withCovers[Math.floor(Math.random()*withCovers.length)];
+      const y = withCovers[Math.floor(Math.random()*withCovers.length)];
+      if(x.name===y.name) continue;
+      const ratio = Math.max(x.covers,y.covers)/Math.min(x.covers,y.covers);
+      if(ratio < 1.5) continue;   // need a clear, defensible gap
+      const more = x.covers > y.covers ? x : y;
+      const less = x.covers > y.covers ? y : x;
+      return {
+        kind:'covers',
+        generated:true,
+        eyebrow:`A song only gets covered if another artist thinks it's worth recording.`,
+        story:(function(){
+          const tm = balanceQuotes(idTail(more)), tl = balanceQuotes(idTail(less));
+          let intro = '';
+          if(tm && tl) intro = `To place them: ${disp(more)}, ${tm}, and ${disp(less)}, ${tl}. `;
+          else if(tm) intro = `To place the less familiar name: ${disp(more)}, ${tm}. `;
+          else if(tl) intro = `To place the less familiar name: ${disp(less)}, ${tl}. `;
+          return intro + `One way to measure a songwriter is how many other artists chose to record their songs. `+
+                 `A deep, much-covered catalog means the writing stood on its own, apart from the original singer. `+
+                 `One of these two has had far more of their songs covered by others.`;
+        })(),
+        ask:`Whose songs have been covered more: ${disp(more)} or ${disp(less)}?`,
+        answer:disp(more),
+        options: Math.random()<0.5 ? [disp(more), disp(less)] : [disp(less), disp(more)],
+        reveal:(function(){
+          const r = ratio>=2 ? Math.round(ratio)+' times as many' : 'more';
+          return `${disp(more)} has had ${r} songs covered by other performers.`+
+                 knownForSentence(lessFamiliar(more,less))+
+                 ` Other artists keep reaching for those songs, which is its own kind of proof that the writing runs deep.`;
+        })(),
+        locator:`Cover counts come from SecondHandSongs, tracked for the writers in the book.`
+      };
+    }
+    return null;
+  }
+
+
+  // ===== WIN THE MEASURE: who reaches the ceiling on one specific craft measure? =====
+  // Built from the book's "Who Won Each Measure" chapter. Each measure has a "ceiling club."
+  // Answer = a club member; distractor = a famous writer who scored below the ceiling.
+  // Teaches that great writers specialize: the lyric champions, melody champions, and hook
+  // champions are mostly DIFFERENT people.
+  function genMeasure(pool){
+    const MEASURES = [
+      { key:'LC', ceiling:25, name:'Lyrical Craft',
+        ask:'the best pure lyrics, the words on their own',
+        blurb:'Lyrical Craft measures the words on their own, apart from the music. Seven writers reach the ceiling, and the club mixes a Tin Pan Alley sophisticate, a Broadway master, a country writer almost no one has heard of, and a rapper whose debut is taught as literature.' },
+      { key:'MH', ceiling:17, name:'Melody and Harmony',
+        ask:'the richest melody and harmony, the architecture of the sound itself',
+        blurb:'Melody and Harmony measures the chords and tunes, the part a conservatory could grade. To reach the ceiling, a named harmonic technique has to be documented about you in the music-theory literature. The club tilts hard toward Broadway and jazz.' },
+      { key:'HA', ceiling:13, name:'Hook Appeal',
+        ask:'the strongest hook, the thing that catches on the first listen',
+        blurb:'Hook Appeal measures whether a song catches immediately and lodges in your head. It is about how the song was built, not how many records it sold. This is the one measure where living chart-toppers stand even with the legends.' },
+    ];
+    for(let t=0;t<60;t++){
+      const M = MEASURES[Math.floor(Math.random()*MEASURES.length)];
+      const club = pool.filter(a => (a[M.key]||0) === M.ceiling);
+      // distractor: a FAMOUS writer (well-streamed) who is clearly below the ceiling
+      const below = pool.filter(a => (a[M.key]||0) > 0 && (a[M.key]||0) < M.ceiling - 1 && (a.spotify||0) > 4e6);
+      if(club.length < 1 || below.length < 1) continue;
+      const winner = club[Math.floor(Math.random()*club.length)];
+      const distractor = below[Math.floor(Math.random()*below.length)];
+      if(winner.name === distractor.name) continue;
+      return {
+        kind:'measure',
+        generated:true,
+        eyebrow:`Every score in the book is its own contest. This is one of them.`,
+        story:(function(){
+          const tw = balanceQuotes(idTail(winner)), td = balanceQuotes(idTail(distractor));
+          let intro = '';
+          if(tw && td) intro = `${cap(disp(winner))}, ${tw}; ${disp(distractor)}, ${td}. `;
+          else if(tw) intro = `${cap(disp(winner))}, ${tw}. `;
+          else if(td) intro = `${cap(disp(distractor))}, ${td}. `;
+          return intro + `${M.blurb} One of these two reached that ceiling. The other, for all their gifts, did not.`;
+        })(),
+        ask:`Who does the book score higher on ${M.name}: ${disp(winner)} or ${disp(distractor)}?`,
+        answer:disp(winner),
+        options: Math.random()<0.5 ? [disp(winner), disp(distractor)] : [disp(distractor), disp(winner)],
+        reveal:(function(){
+          return `It's ${disp(winner)}, at the very top on ${M.name}.`+knownForSentence(lessFamiliar(winner,distractor))+
+                 ` The point of this measure is that it ignores fame and genre and asks one narrow question, `+
+                 `and the writers who win it are not always the ones who win the others. Great writers tend to specialize: `+
+                 `the ones who top the words are mostly not the ones who top the hooks.`;
+        })(),
+        locator:`See 'Who Won Each Measure' at the front of Part Two.`
+      };
+    }
+    return null;
+  }
+
+
+  // ===== WHO REALLY WROTE IT: famous song, surprising writer (from the songlist) =====
+  // Draws on 189 songs where the best-known performer is NOT the writer - the book's thesis
+  // in pure form. Distractors are other writers from the same genre/era, so it's a real guess.
+  function genSongWriter(pool, songPool){
+    if(!songPool || songPool.length < 4) return null;
+    for(let t=0;t<60;t++){
+      const s = songPool[Math.floor(Math.random()*songPool.length)];
+      // build 2 distractors: other writers (from the artist pool), prefer same genre
+      const sameGenre = pool.filter(a => a.genre===s.genre && a.name!==s.writer);
+      const others = pool.filter(a => a.name!==s.writer);
+      if(sameGenre.length < 2 && others.length < 2) continue;
+      const distractorSource = sameGenre.length>=2 ? sameGenre : others;
+      // pick 2 distinct distractors
+      const d1 = distractorSource[Math.floor(Math.random()*distractorSource.length)];
+      let d2 = distractorSource[Math.floor(Math.random()*distractorSource.length)];
+      let guard=0;
+      while((d2.name===d1.name) && guard++<20) d2 = distractorSource[Math.floor(Math.random()*distractorSource.length)];
+      if(d2.name===d1.name) continue;
+      // writer display name (resolve combined names to clean display via pool if present)
+      const writerEntry = pool.find(a => a.name===s.writer);
+      const writerDisp = writerEntry ? disp(writerEntry) : s.writer;
+      const opts = [writerDisp, disp(d1), disp(d2)];
+      // shuffle
+      for(let i=opts.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [opts[i],opts[j]]=[opts[j],opts[i]]; }
+      return {
+        kind:'who really wrote it',
+        generated:true,
+        genre:s.genre, era:s.era,   // tags for filtering
+        eyebrow:`Everyone knows who sang it. The question is who wrote it.`,
+        story:`The song "${s.song}" is bound up with ${s.performer}, the voice that made it famous. But the person who actually wrote it is someone else, and that gap, between the singer everyone remembers and the writer almost no one does, is what this whole book is about.`,
+        ask:`Who wrote "${s.song}"?`,
+        answer:writerDisp,
+        options:opts,
+        reveal:(function(){
+          let base = `It was ${writerDisp}. ${s.performer} made "${s.song}" famous, but the song came from ${writerDisp}.`;
+          if(writerEntry && writerEntry.knownFor){ base += knownForSentence(writerEntry); }
+          base += ` The singer gets remembered. The writer is the one this book is trying to give back.`;
+          return base;
+        })(),
+        locator:`${writerDisp}'s card${writerEntry ? ', in the '+writerEntry.genre+' section' : ''}.`
+      };
+    }
+    return null;
+  }
+
+  // public: generate one ranking question from the artist pool
+  function generate(artists, songPool){
+    // pool = artists with enough recognizability; use all ranked artists
+    const pool = artists.filter(a => a.rank && a.name);
+    // seven generated question types, weighted:
+    const roll = Math.random();
+    let q;
+    if(roll < 0.14) q = genFair(pool);
+    else if(roll < 0.26) q = genUpset(pool);
+    else if(roll < 0.37) q = genSpotify(pool);
+    else if(roll < 0.48) q = genSongcraft(pool);
+    else if(roll < 0.58) q = genGrammy(pool);
+    else if(roll < 0.67) q = genHall(pool);
+    else if(roll < 0.75) q = genCovers(pool);
+    else if(roll < 0.84) q = genMeasure(pool);
+    else if(roll < 0.93) q = genSongWriter(pool, songPool);
+    else q = genGenre(pool);
+    // fallbacks if a type couldn't build a valid pair
+    if(!q) q = genSongWriter(pool, songPool) || genFair(pool) || genUpset(pool) || genMeasure(pool) || genGrammy(pool) || genHall(pool);
+    return q;
+  }
+
+  return { generate };
+})();
+
+
+const S = { streak:0, best:0, seen:0, close:0, q:null, answered:false, order:[], idx:0 };
+// ===== FILTER STATE & LOGIC =====
+const GENRE_LIST = ['Pop','Rock','Soul / R&B','Folk / Americana','Country','Hip-Hop','Songbook','Blues','Jazz','Reggae','Gospel'];
+const ERA_LIST = [
+  {key:'founders', label:'The Founders', sub:'pre-1955'},
+  {key:'rise',     label:'The Rise',     sub:'1955–1965'},
+  {key:'golden',   label:'The Golden Era', sub:'1966–1979'},
+  {key:'modern',   label:'The Modern Era', sub:'1980–now'}
+];
+// filter state: every genre/era enabled by default
+const F = {
+  genres: new Set(GENRE_LIST),
+  eras: new Set(ERA_LIST.map(e=>e.key))
+};
+
+function buildChips(){
+  const g=document.getElementById('genreChips'); g.innerHTML='';
+  GENRE_LIST.forEach(name=>{
+    const c=document.createElement('div');
+    c.className='chip'+(F.genres.has(name)?' on':'');
+    c.textContent=name.replace(' / ','/');
+    c.onclick=()=>{ if(F.genres.has(name)) F.genres.delete(name); else F.genres.add(name); c.classList.toggle('on'); updateFilterUI(); };
+    g.appendChild(c);
+  });
+  const e=document.getElementById('eraChips'); e.innerHTML='';
+  ERA_LIST.forEach(era=>{
+    const c=document.createElement('div');
+    c.className='chip'+(F.eras.has(era.key)?' on':'');
+    c.innerHTML=era.label+' <span style="opacity:.7;font-size:11px">'+era.sub+'</span>';
+    c.onclick=()=>{ if(F.eras.has(era.key)) F.eras.delete(era.key); else F.eras.add(era.key); c.classList.toggle('on'); updateFilterUI(); };
+    e.appendChild(c);
+  });
+}
+function allGenres(on){ if(on){ F.genres=new Set(GENRE_LIST); } buildChips(); updateFilterUI(); }
+function allEras(on){ if(on){ F.eras=new Set(ERA_LIST.map(x=>x.key)); } buildChips(); updateFilterUI(); }
+
+function updateFilterUI(){
+  const allOn = F.genres.size===GENRE_LIST.length && F.eras.size===ERA_LIST.length;
+  const btn=document.getElementById('filterBtn');
+  const label=document.getElementById('filterBtnLabel');
+  btn.classList.toggle('allon', allOn);
+  const offCount=(GENRE_LIST.length-F.genres.size)+(ERA_LIST.length-F.eras.size);
+  label.textContent = allOn ? 'Filter' : ('Filter · '+offCount+' off');
+  // warn if nothing can be served
+  const note=document.getElementById('panelNote');
+  if(F.genres.size===0){ note.textContent='Turn on at least one genre to keep playing.'; }
+  else if(F.eras.size===0){ note.textContent='Turn on at least one era to keep playing.'; }
+  else note.textContent='';
+}
+function togglePanel(){
+  const p=document.getElementById('panel');
+  p.classList.toggle('open');
+}
+
+// Does a question pass the current filter?
+// Rule: the question must TOUCH an enabled genre AND TOUCH an enabled era.
+// "Touch" = at least one of the question's tagged genres/eras is enabled.
+// This honors the cross-era design: picking one era still admits older writers
+// as long as the question also involves the selected era.
+function passesFilter(q){
+  const qg = q.genres || (q.genre ? [q.genre] : []);
+  const qe = q.eras || (q.era ? [q.era] : []);
+  // untagged questions always pass (don't hide content we couldn't classify)
+  if(qg.length===0 && qe.length===0) return true;
+  // if we have no enabled genres or eras, nothing passes (handled by UI warning)
+  if(F.genres.size===0 || F.eras.size===0) return true; // failsafe: don't hard-block
+  const genreOK = qg.length===0 || qg.some(g=>F.genres.has(g));
+  const eraOK = qe.length===0 || qe.some(e=>F.eras.has(e));
+  return genreOK && eraOK;
+}
+
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function el(id){return document.getElementById(id)}
+
+function nextQuestion(){
+  if(!S.recentAsks) S.recentAsks = [];
+  let fallback = null;
+  for(let attempt=0; attempt<60; attempt++){
+    let cand;
+    if(Math.random() < 0.6){ cand = RANK_GEN.generate(GEN_ARTISTS, SONG_POOL); }
+    else { if(S.idx >= S.order.length){ S.order = shuffle(QUESTIONS.map((_,i)=>i)); S.idx = 0; } cand = QUESTIONS[S.order[S.idx]]; S.idx++; }
+    if(!cand) continue;
+    if(!passesFilter(cand)) continue;        // honor genre/era filter
+    if(!fallback) fallback = cand;            // first filter-passing candidate, in case all repeat
+    if(!S.recentAsks.includes(cand.ask)){
+      S.q = cand; S.answered = false;
+      S.recentAsks.push(cand.ask);
+      if(S.recentAsks.length > 6) S.recentAsks.shift();
+      render(); return;
+    }
+  }
+  // nothing fresh passed; use the first filter-passing candidate if we found one
+  if(fallback){ S.q = fallback; S.answered = false; render(); return; }
+  // filter too tight to serve anything -> show an unfiltered question rather than break
+  const g = RANK_GEN.generate(GEN_ARTISTS, SONG_POOL) || QUESTIONS[0];
+  S.q = g; S.answered = false; render();
+}
+
+function render(){
+  const q = S.q;
+  el('eyebrow').textContent = q.eyebrow;
+  el('story').innerHTML = '<p>'+q.story.replace(/\n/g,'</p><p>')+'</p>';
+  el('ask').innerHTML = q.ask;
+  el('reveal').className = 'reveal';
+
+  const wrap = el('opts'); wrap.innerHTML='';
+  const opts = shuffle(q.options);
+  opts.forEach((text,i)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.innerHTML = '<span class="mk">'+String.fromCharCode(65+i)+'</span><span>'+text+'</span>';
+    b.onclick = ()=>answer(text, b);
+    wrap.appendChild(b);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function answer(picked, btn){
+  if(S.answered) return;
+  S.answered = true;
+  const q = S.q;
+  const correct = picked === q.answer;
+
+  // lock & mark all options
+  [...document.querySelectorAll('.opt')].forEach(b=>{
+    b.disabled = true;
+    const txt = b.querySelector('span:last-child').textContent;
+    if(txt === q.answer) b.classList.add('correct');
+    else if(b===btn) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+
+  // scores
+  S.seen++;
+  if(correct){ S.streak++; S.close++; S.best=Math.max(S.best,S.streak); }
+  else { S.streak=0; }
+  el('sStreak').textContent=S.streak; el('sBest').textContent=S.best;
+  el('sSeen').textContent=S.seen; el('sClose').textContent=S.close;
+
+  // reveal — teaches either way, never "you lose"
+  el('verdict').textContent = correct ? 'You got it' : 'Good guess';
+  el('verdict').className = 'verdict ' + (correct?'win':'lose');
+  el('teach').textContent = q.reveal;
+  el('locText').textContent = q.locator;
+  el('reveal').className = 'reveal show';
+  el('next').textContent = 'Next Story';
+}
+
+el('next').onclick = nextQuestion;
+
+// start
+buildChips();
+updateFilterUI();
+S.order = shuffle(QUESTIONS.map((_,i)=>i));
+nextQuestion();
+</script>
+</body>
+</html>
