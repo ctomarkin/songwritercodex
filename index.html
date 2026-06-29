@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Songwriter Codex — Who Really Built American Music</title>
+<meta name="description" content="We remember who sang it. We forget who wrote it. A data-driven reckoning with who really built American music — and a game that proves it.">
+
+<!-- Open Graph: controls how the link looks when shared / pasted in a playlist bio -->
+<meta property="og:title" content="The Songwriter Codex — Who Really Built American Music">
+<meta property="og:description" content="We remember who sang it. We forget who wrote it. Play the game, then get the book.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://songwritercodex.com">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,800;1,500;1,600&family=Archivo+Narrow:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE6D6; --paper2:#E5DCC8; --ink:#1A1815; --ink2:#3A352C;
+    --ox:#8B2E2E; --brass:#A8842C; --hair:#C9BEA4; --label:#7A6E54;
+    --good:#3F6B43; --goodbg:#E2E8D6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Newsreader',Georgia,serif;
+    line-height:1.5;
+    background-image:radial-gradient(rgba(120,100,60,.045) 1px, transparent 1px);
+    background-size:4px 4px;
+    min-height:100vh;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:22px 20px 60px}
+
+  /* ---- masthead (matches the game) ---- */
+  header{padding-bottom:14px;border-bottom:2px solid var(--ink);margin-bottom:6px;
+         display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+  .brand{font-family:'Playfair Display',serif;font-weight:800;font-size:23px;letter-spacing:-.01em;line-height:1}
+  .brand .c{color:var(--brass)}
+  .tag{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:.22em;
+       font-size:10px;color:var(--label);margin-top:6px}
+  .dateline{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:.14em;
+            font-size:9px;color:var(--label);text-align:right;line-height:1.5;flex:none}
+
+  /* ---- hero: the spine of the book ---- */
+  .hero{padding:46px 0 30px;text-align:center;border-bottom:1px solid var(--hair)}
+  .kicker{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+          letter-spacing:.16em;font-size:11px;color:var(--ox);margin-bottom:22px}
+  .spine{font-family:'Playfair Display',serif;font-weight:800;font-size:38px;line-height:1.12;
+         letter-spacing:-.015em;color:var(--ink)}
+  .spine .turn{display:block;color:var(--brass);font-style:italic;font-weight:600}
+  .subspine{font-size:20px;line-height:1.5;color:var(--ink2);margin:24px auto 0;max-width:30em}
+
+  /* ---- the title block ---- */
+  .titleblock{text-align:center;padding:34px 0 30px;border-bottom:1px solid var(--hair)}
+  .booktitle{font-family:'Playfair Display',serif;font-weight:800;font-size:21px;letter-spacing:.01em;
+             text-transform:uppercase;line-height:1.25}
+  .booksub{font-family:'Newsreader',serif;font-style:italic;font-size:17px;color:var(--ink2);
+           margin-top:10px;line-height:1.45}
+  .byline{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:.14em;
+          font-size:11px;color:var(--label);margin-top:16px}
+  .cred{font-family:'Newsreader',serif;font-style:italic;font-size:13.5px;color:var(--label);
+        max-width:32em;margin:12px auto 0;line-height:1.5}
+  .figure{font-family:'Playfair Display',serif;font-weight:700;color:var(--ox)}
+
+  /* ---- news hook: the live event ---- */
+  .newshook{padding:30px 0;border-bottom:1px solid var(--hair)}
+  .newslabel{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+             letter-spacing:.14em;font-size:11px;color:var(--ox);text-align:center;margin-bottom:16px}
+  .newshook p{font-family:'Newsreader',serif;font-size:17.5px;line-height:1.6;color:var(--ink2);
+              max-width:33em;margin:0 auto;border-left:3px solid var(--brass);
+              padding:4px 0 4px 20px}
+  .newshook em{font-style:italic;color:var(--ink)}
+
+  /* ---- the play invitation: primary action ---- */
+  .play{padding:38px 0;text-align:center;border-bottom:1px solid var(--hair)}
+  .play .lead-in{font-family:'Newsreader',serif;font-size:19px;line-height:1.55;color:var(--ink2);
+                 max-width:30em;margin:0 auto 24px}
+  .play .lead-in b{color:var(--ink);font-weight:600}
+  .playbtn{display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;
+           font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+           letter-spacing:.12em;font-size:16px;padding:18px 40px;border-radius:4px;
+           transition:background .15s,transform .1s}
+  .playbtn:hover{background:#000}
+  .playbtn:active{transform:scale(.98)}
+  .playnote{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:.12em;
+            font-size:10px;color:var(--label);margin-top:14px}
+
+  /* ---- three sample cards (the hook, made concrete) ---- */
+  .proof{padding:38px 0 30px;border-bottom:1px solid var(--hair)}
+  .proofhead{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+             letter-spacing:.14em;font-size:11px;color:var(--ox);text-align:center;margin-bottom:24px}
+  .swaps{display:flex;flex-direction:column;gap:12px}
+  .swap{background:linear-gradient(180deg,#EFE9DB,#E8E0CD);border:1px solid var(--hair);
+        border-radius:5px;padding:16px 18px;
+        box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 4px 12px rgba(60,45,20,.05)}
+  .swap .known{font-family:'Newsreader',serif;font-size:17px;color:var(--ink2);line-height:1.4}
+  .swap .known b{color:var(--ink);font-weight:600;font-style:italic}
+  .swap .writer{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:.08em;
+                font-size:13px;color:var(--ox);font-weight:700;margin-top:7px;display:flex;align-items:baseline;gap:8px}
+  .swap .writer .arrow{color:var(--brass);font-size:14px}
+
+  /* ---- email capture: the whole point, pre-launch ---- */
+  .signup{padding:42px 0 38px;text-align:center;border-bottom:1px solid var(--hair)}
+  .signup .eyebrow{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+                   letter-spacing:.16em;font-size:11px;color:var(--ox);margin-bottom:14px}
+  .signup h2{font-family:'Playfair Display',serif;font-weight:800;font-size:27px;line-height:1.18;
+             letter-spacing:-.01em;margin-bottom:14px}
+  .signup p{font-family:'Newsreader',serif;font-size:18px;line-height:1.5;color:var(--ink2);
+            max-width:28em;margin:0 auto 26px}
+  .form{display:flex;gap:9px;max-width:440px;margin:0 auto;flex-wrap:wrap}
+  .form input[type=email]{
+    flex:1;min-width:200px;font-family:'Newsreader',serif;font-size:17px;color:var(--ink);
+    background:rgba(255,255,255,.45);border:1.5px solid var(--hair);border-radius:4px;
+    padding:15px 16px;transition:border-color .15s}
+  .form input[type=email]::placeholder{color:var(--label);font-style:italic}
+  .form input[type=email]:focus{outline:none;border-color:var(--brass);background:rgba(255,255,255,.65)}
+  .form button{flex:none;font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+               letter-spacing:.1em;font-size:14px;color:var(--paper);background:var(--ox);border:none;
+               border-radius:4px;padding:15px 26px;cursor:pointer;transition:background .15s,transform .1s}
+  .form button:hover{background:#741f1f}
+  .form button:active{transform:scale(.97)}
+  .formnote{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:.1em;
+            font-size:10px;color:var(--label);margin-top:16px}
+  .formok{font-family:'Newsreader',serif;font-style:italic;font-size:18px;color:var(--good);
+          margin-top:18px;min-height:24px}
+
+  /* ---- the case (what the book argues) ---- */
+  .case{padding:36px 0 30px}
+  .case p{font-family:'Newsreader',serif;font-size:18.5px;line-height:1.62;color:var(--ink2);
+          max-width:34em;margin:0 auto 16px}
+  .case p:last-child{margin-bottom:0}
+  .case b{color:var(--ink);font-weight:600}
+  .case .first{font-size:20px;color:var(--ink)}
+
+  footer{margin-top:30px;padding-top:22px;border-top:2px solid var(--ink);text-align:center;
+         font-family:'Archivo Narrow',sans-serif;font-size:12px;color:var(--label);line-height:1.7}
+  footer em{font-style:italic;color:var(--ink2)}
+  .ver{margin-top:10px;font-size:8.5px;letter-spacing:.1em;color:var(--hair);text-transform:uppercase}
+
+  @media(max-width:520px){
+    .spine{font-size:29px} .subspine{font-size:18px} .signup h2{font-size:23px}
+    .hero{padding:36px 0 26px} .dateline{display:none}
+    header{align-items:center}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="brand">The Songwriter <span class="c">Codex</span></div>
+      <div class="tag">Who Really Built American Music</div>
+    </div>
+    <div class="dateline">Forthcoming<br>First Edition</div>
+  </header>
+
+  <!-- HERO: the spine of the book, set as the thesis -->
+  <section class="hero">
+    <div class="kicker">The Argument in One Line</div>
+    <h1 class="spine">
+      We remember who sang it.
+      <span class="turn">We forget who wrote it.</span>
+    </h1>
+    <p class="subspine">For sixty years, the story of American music has been told through its voices. This book tells it through its builders — scored, ranked, and checked against <span class="figure">226 billion</span> listens.</p>
+  </section>
+
+  <!-- NEWS HOOK: the live event the book opens on -->
+  <section class="newshook">
+    <div class="newslabel">The Fight This Book Settles</div>
+    <p>In May 2026, the <em>New York Times</em> named the thirty greatest living American songwriters. More than 250 music professionals voted — and then five critics overruled them and picked the names themselves. The songwriter the working songwriters ranked first, Tom Waits, was left off entirely. The argument went nowhere, because nothing sat underneath it. No way to look it up. So I built one.</p>
+  </section>
+
+  <!-- TITLE BLOCK -->
+  <section class="titleblock">
+    <div class="booktitle">The Songwriter Codex</div>
+    <div class="booksub">Who Really Built American Music.<br>What <span class="figure">226 billion</span> listens reveal.</div>
+    <div class="byline">A Book by Craig W. Tomarkin</div>
+    <div class="cred">Thirty years isolating signal from noise in massive datasets · reached the Netflix Prize leaderboard in two weeks · a jazz pianist with, by his own count, a viewership statistically indistinguishable from zero</div>
+  </section>
+
+  <!-- PLAY: primary action before launch -->
+  <section class="play">
+    <p class="lead-in">Before you read a word of the book, <b>play the argument.</b> Ten kinds of question, drawn straight from the manuscript. Most people miss more than they expect.</p>
+    <a class="playbtn" href="/play">Play the Game</a>
+    <div class="playnote">Free · No sign-up · 164 songwriters ranked</div>
+  </section>
+
+  <!-- PROOF: the hook made concrete -->
+  <section class="proof">
+    <div class="proofhead">You know the song. Meet the writer.</div>
+    <div class="swaps">
+      <div class="swap">
+        <div class="known">You heard <b>"Downtown Train"</b> and thought Rod Stewart.</div>
+        <div class="writer"><span class="arrow">written by</span> Tom Waits</div>
+      </div>
+      <div class="swap">
+        <div class="known">You know <b>"Respect"</b> is Aretha Franklin.</div>
+        <div class="writer"><span class="arrow">written by</span> Otis Redding</div>
+      </div>
+      <div class="swap">
+        <div class="known">You know <b>"Hound Dog"</b> is Elvis.</div>
+        <div class="writer"><span class="arrow">written by</span> Leiber &amp; Stoller, for Big Mama Thornton</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGNUP: the conversion goal during pre-launch -->
+  <section class="signup" id="notify">
+    <div class="eyebrow">Not Out Yet</div>
+    <h2>Be first to know when it lands.</h2>
+    <p>The book is in final edits. Leave your email and you'll get a free chapter now, and word the day it publishes — before it's anywhere else.</p>
+    <form class="form" id="signupForm" novalidate>
+      <input type="email" id="email" name="email" placeholder="you@email.com" autocomplete="email" required aria-label="Email address">
+      <button type="submit">Send My Chapter</button>
+    </form>
+    <div class="formok" id="formOk" role="status" aria-live="polite"></div>
+    <div class="formnote">No spam. One note when it's out. Unsubscribe anytime.</div>
+  </section>
+
+  <!-- THE CASE -->
+  <section class="case">
+    <p class="first">The book rests on one measurement: 164 songwriters scored across eight measures of songcraft — who built the form, not who got famous singing inside it.</p>
+    <p>Then that score is set against what the institutions already decided: the Grammys, the Halls of Fame, the magazine lists, added into a single number. <b>The distance between the two is the gap, and the gap is the finding.</b> Roughly half the book moves more than thirty places between what someone built and the credit they were given.</p>
+    <p>Take Thomas Dorsey, who wrote "Take My Hand, Precious Lord" and effectively invented gospel — the language soul, R&amp;B, and rock all grew out of. Add up every honor the institutions ever gave him and he lands 144th of 164. Measure what he actually built and he lands 30th. <b>A gap of 114 places — the largest in the book.</b> They let him in the door and stood him against the back wall of the room he built.</p>
+    <p>And it isn't one machine's opinion. Run 226 billion plays by people who never heard of me — the largest record of what listeners actually do — and it draws the same map, putting the right writers side by side without being told the history. Two measurements pointing one way, and a mountain of raw behavior pointing the same way.</p>
+  </section>
+
+  <footer>
+    Every story in the game is true, and comes from<br>
+    <em>The Songwriter Codex</em> by Craig W. Tomarkin.
+    <div class="ver">A pre-launch edition · songwritercodex.com</div>
+  </footer>
+
+</div>
+
+<script>
+  // --- Email capture ---
+  // RIGHT NOW: this stores nothing and just confirms on screen, so the page works
+  // the moment you deploy. To make it real, pick ONE of the two options below.
+  //
+  // OPTION A — easiest, no backend: replace the <form> action with your email
+  // provider's hosted form (Mailchimp / ConvertKit / Substack / Beehiiv all give
+  // you an embed). You then delete this whole script block.
+  //
+  // OPTION B — keep this look, send to your provider's API endpoint: replace the
+  // PROVIDER_ENDPOINT below with the form-submit URL your provider gives you and
+  // uncomment the fetch() block.
+
+  const PROVIDER_ENDPOINT = ""; // <-- paste your Mailchimp/ConvertKit form URL here
+
+  const form = document.getElementById('signupForm');
+  const emailInput = document.getElementById('email');
+  const ok = document.getElementById('formOk');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    if(!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+      ok.style.color = 'var(--ox)';
+      ok.textContent = 'That email doesn\u2019t look right \u2014 mind checking it?';
+      emailInput.focus();
+      return;
+    }
+
+    // OPTION B: send it to your provider. Uncomment when PROVIDER_ENDPOINT is set.
+    /*
+    if(PROVIDER_ENDPOINT){
+      fetch(PROVIDER_ENDPOINT, {
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:'email='+encodeURIComponent(email)
+      });
+    }
+    */
+
+    ok.style.color = 'var(--good)';
+    ok.textContent = 'You\u2019re on the list. Your free chapter is on its way.';
+    form.reset();
+  });
+</script>
+</body>
+</html>
