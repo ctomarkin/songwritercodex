@@ -239,25 +239,17 @@
 </div>
 
 <script>
-  // --- Email capture ---
-  // RIGHT NOW: this stores nothing and just confirms on screen, so the page works
-  // the moment you deploy. To make it real, pick ONE of the two options below.
-  //
-  // OPTION A — easiest, no backend: replace the <form> action with your email
-  // provider's hosted form (Mailchimp / ConvertKit / Substack / Beehiiv all give
-  // you an embed). You then delete this whole script block.
-  //
-  // OPTION B — keep this look, send to your provider's API endpoint: replace the
-  // PROVIDER_ENDPOINT below with the form-submit URL your provider gives you and
-  // uncomment the fetch() block.
-
-  const PROVIDER_ENDPOINT = ""; // <-- paste your Mailchimp/ConvertKit form URL here
+  // --- Email capture: wired to Kit (form uid 182585ed06) ---
+  // This keeps the site's own styled form and posts the email to Kit behind the
+  // scenes, so signups land in the Kit dashboard and trigger the free chapter.
+  const KIT_FORM_UID = "182585ed06";
+  const KIT_ENDPOINT = "https://app.kit.com/forms/" + KIT_FORM_UID + "/subscriptions";
 
   const form = document.getElementById('signupForm');
   const emailInput = document.getElementById('email');
   const ok = document.getElementById('formOk');
 
-  form.addEventListener('submit', function(e){
+  form.addEventListener('submit', async function(e){
     e.preventDefault();
     const email = emailInput.value.trim();
     if(!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
@@ -267,21 +259,28 @@
       return;
     }
 
-    // OPTION B: send it to your provider. Uncomment when PROVIDER_ENDPOINT is set.
-    /*
-    if(PROVIDER_ENDPOINT){
-      fetch(PROVIDER_ENDPOINT, {
-        method:'POST',
-        mode:'no-cors',
-        headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body:'email='+encodeURIComponent(email)
-      });
-    }
-    */
+    ok.style.color = 'var(--label)';
+    ok.textContent = 'Adding you\u2026';
 
-    ok.style.color = 'var(--good)';
-    ok.textContent = 'You\u2019re on the list. Your free chapter is on its way.';
-    form.reset();
+    try{
+      const data = new FormData();
+      data.append('email_address', email);
+      const res = await fetch(KIT_ENDPOINT, {
+        method:'POST',
+        headers:{ 'Accept':'application/json' },
+        body:data
+      });
+      if(res.ok){
+        ok.style.color = 'var(--good)';
+        ok.textContent = 'You\u2019re on the list. Check your inbox for the free chapter.';
+        form.reset();
+      } else {
+        throw new Error('bad status');
+      }
+    } catch(err){
+      ok.style.color = 'var(--ox)';
+      ok.textContent = 'Something went wrong \u2014 please try again in a moment.';
+    }
   });
 </script>
 </body>
