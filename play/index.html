@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8">
@@ -948,7 +949,7 @@ function openDoor(){ el('game').classList.add('hidden'); el('door').classList.re
 
 // ---- game state ----
 let MODE='guess';
-const S={ i:0, answered:false, uncovered:0, seen:new Set(), recent:[] };
+const S={ i:0, answered:false, uncovered:0, seen:new Set(), recent:[], recentWriters:[] };
 
 function activeGenreSet(){
   // if all 6 selected -> include 'Other' artists too (All Genres). Represent as a set incl 'All'.
@@ -964,37 +965,64 @@ function startGame(){
   nextCard();
 }
 
-// does a who-wrote-it card pass the filter? (same logic: genre enabled + era soft-ish)
+// does a who-wrote-it card pass the filter?
+// Genre is a hard gate (same-genre only, like everywhere else). Era is SOFT: the who-wrote-it
+// cards live mostly in older music (the writer-vs-performer gap mostly predates ~1994), so a
+// hard era filter on a recent-era selection starves the pool down to a handful of writers and
+// you see the same Cobain / Max Martin cards on a loop. Soft era (genre match is enough, era is
+// a preference not a gate) opens the pool to the full catalog and matches the connection rule
+// used by the comparison questions.
 function whoCardPasses(c){
   const gset=activeGenreSet();
   const genreOK = gset.has(c.genreStd) || gset.has('All');
-  const eraOK = SEL.eras.has(c.eraKey);
-  return genreOK && eraOK;
+  return genreOK;
 }
-function eligibleWhoCards(){ return WHO_CARDS.filter(whoCardPasses); }
+// prefer cards that DO touch a selected era, but fall back to any genre-matched card so the
+// pool is never starved. Returns era-matching cards if there are enough, else all genre matches.
+function eligibleWhoCards(){
+  const all = WHO_CARDS.filter(whoCardPasses);
+  const inEra = all.filter(c => SEL.eras.has(c.eraKey));
+  return inEra.length >= 8 ? mixEraPreferred(all, inEra) : all;
+}
+// blend: mostly era-matching cards, but salt in out-of-era ones so the pool stays varied
+function mixEraPreferred(all, inEra){
+  // 70% chance to draw from the in-era set, 30% from the full set - keeps recency feel
+  // while still surfacing the rich older who-cards that carry the book's thesis
+  return Math.random() < 0.7 ? inEra : all;
+}
 
 function nextCard(){
   S.answered=false;
-  // Decide what to serve: mix who-wrote-it cards with generated 10-type questions.
-  // ~45% who-wrote-it (if any pass filter), else generated.
+  // Mix who-wrote-it cards with the nine generated question types. The generated types draw
+  // from all 164 artists and almost never repeat; the who-cards are the scarcest content (and
+  // the book's purest thesis), so they're the spice, not the main course. The who-card share is
+  // ADAPTIVE: when few who-cards pass the current filter, lean harder on generated questions,
+  // because that's exactly when who-cards would start repeating (the Cobain / Max Martin loop).
   const who=eligibleWhoCards();
+  const distinctWriters = new Set(who.map(c=>c.writer)).size;
+  // base share 0.32; scale DOWN when the writer pool is thin so we don't loop the same few.
+  let whoShare = 0.32;
+  if(distinctWriters < 8)  whoShare = 0.15;   // very thin -> mostly generated variety
+  else if(distinctWriters < 20) whoShare = 0.24;
   let item=null, isWho=false;
   for(let t=0;t<30;t++){
-    if(who.length && Math.random()<0.45){
+    if(who.length && Math.random()<whoShare){
       const c=who[Math.floor(Math.random()*who.length)];
-      if(!S.recent.includes('w:'+c.song)){ item=c; isWho=true; break; }
+      // avoid repeating the same SONG or the same WRITER too soon (writers repeat faster)
+      if(!S.recent.includes('w:'+c.song) && !S.recentWriters.includes(c.writer)){ item=c; isWho=true; break; }
     } else {
       const q=RANK_GEN.generate(GEN_ARTISTS, SONG_POOL);
       if(q && !S.recent.includes('q:'+q.ask)){ item=q; isWho=false; break; }
     }
   }
   if(!item){ // fallback
-    if(who.length){ item=who[Math.floor(Math.random()*who.length)]; isWho=true; }
-    else { item=RANK_GEN.generate(GEN_ARTISTS, SONG_POOL); isWho=false; }
+    if(who.length && Math.random()<whoShare){ item=who[Math.floor(Math.random()*who.length)]; isWho=true; }
+    else { item=RANK_GEN.generate(GEN_ARTISTS, SONG_POOL) || who[Math.floor(Math.random()*who.length)]; isWho=!item || !item.ask; if(!item){item=who[0];isWho=true;} }
   }
   S.cur=item; S.curIsWho=isWho;
   const tag = isWho ? 'w:'+item.song : 'q:'+(item&&item.ask);
   S.recent.push(tag); if(S.recent.length>6) S.recent.shift();
+  if(isWho){ S.recentWriters.push(item.writer); if(S.recentWriters.length>5) S.recentWriters.shift(); }
   S.i++;
   render();
 }
