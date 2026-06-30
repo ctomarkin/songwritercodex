@@ -52,6 +52,7 @@
          letter-spacing:-.015em;color:var(--ink)}
   .spine .turn{display:block;color:var(--brass);font-style:italic;font-weight:600}
   .subspine{font-size:20px;line-height:1.5;color:var(--ink2);margin:24px auto 0;max-width:30em}
+  .subspine b{color:var(--ink);font-weight:600}
 
   /* ---- the title block ---- */
   .titleblock{text-align:center;padding:34px 0 30px;border-bottom:1px solid var(--hair)}
@@ -101,6 +102,9 @@
   .swap .writer{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:.08em;
                 font-size:13px;color:var(--ox);font-weight:700;margin-top:7px;display:flex;align-items:baseline;gap:8px}
   .swap .writer .arrow{color:var(--brass);font-size:14px}
+  .proofnote{font-family:'Newsreader',serif;font-size:16.5px;line-height:1.6;color:var(--ink2);
+             max-width:33em;margin:22px auto 0;text-align:center}
+  .proofnote b{color:var(--ink);font-weight:600} .proofnote em{font-style:italic;color:var(--ink)}
 
   /* ---- email capture: the whole point, pre-launch ---- */
   .signup{padding:42px 0 38px;text-align:center;border-bottom:1px solid var(--hair)}
@@ -134,6 +138,8 @@
   .case p:last-child{margin-bottom:0}
   .case b{color:var(--ink);font-weight:600}
   .case .first{font-size:20px;color:var(--ink)}
+  .case .caseclose{border-left:3px solid var(--brass);padding:2px 0 2px 20px;font-style:italic;color:var(--ink)}
+  .case em{font-style:italic;color:var(--ink)}
 
   footer{margin-top:30px;padding-top:22px;border-top:2px solid var(--ink);text-align:center;
          font-family:'Archivo Narrow',sans-serif;font-size:12px;color:var(--label);line-height:1.7}
@@ -161,12 +167,12 @@
 
   <!-- HERO: the spine of the book, set as the thesis -->
   <section class="hero">
-    <div class="kicker">The Argument in One Line</div>
+    <div class="kicker">The Question This Book Answers</div>
     <h1 class="spine">
-      We remember who sang it.
-      <span class="turn">We forget who wrote it.</span>
+      Who really
+      <span class="turn">built American music?</span>
     </h1>
-    <p class="subspine">For sixty years, the story of American music has been told through its voices. This book tells it through its builders — scored, ranked, and checked against <span class="figure">226 billion</span> listens.</p>
+    <p class="subspine">Not who got famous singing it. Who <b>built</b> it. This book scores 164 songwriters on the craft itself, then sets that against the credit the Grammys and Halls of Fame handed out. The distance between the two is the whole story.</p>
   </section>
 
   <!-- NEWS HOOK: the live event the book opens on -->
@@ -180,7 +186,7 @@
     <div class="booktitle">The Songwriter Codex</div>
     <div class="booksub">Who Really Built American Music.<br>What <span class="figure">226 billion</span> listens reveal.</div>
     <div class="byline">A Book by Craig W. Tomarkin</div>
-    <div class="cred">Thirty years isolating signal from noise in massive datasets · reached the Netflix Prize leaderboard in two weeks · a jazz pianist with, by his own count, a viewership statistically indistinguishable from zero</div>
+    <div class="cred">Thirty years finding the real pattern inside huge piles of data · reached the Netflix Prize leaderboard in two weeks · a jazz pianist with, by his own count, a viewership statistically indistinguishable from zero</div>
   </section>
 
   <!-- PLAY: primary action before launch -->
@@ -207,16 +213,17 @@
         <div class="writer"><span class="arrow">written by</span> Leiber &amp; Stoller, for Big Mama Thornton</div>
       </div>
     </div>
+    <p class="proofnote">That is the easy version of the problem: a famous voice borrows a song and keeps the credit. But some names in this book you <em>do</em> know as the writer &mdash; Prince, Stevie Wonder, Taylor Swift. They rank high here because they <b>built</b> something, not because they sang it. The book measures what each writer made, whether they sang it themselves or handed it to someone else.</p>
   </section>
 
   <!-- SIGNUP: the conversion goal during pre-launch -->
   <section class="signup" id="notify">
     <div class="eyebrow">Not Out Yet</div>
     <h2>Be first to know when it lands.</h2>
-    <p>The book is in final edits. Leave your email and you'll get a free chapter now, and word the day it publishes — before it's anywhere else.</p>
+    <p>The book is in final edits. Leave your email and you'll get word the day it publishes &mdash; before it's anywhere else &mdash; plus a sample chapter on the way.</p>
     <form class="form" id="signupForm" novalidate>
       <input type="email" id="email" name="email" placeholder="you@email.com" autocomplete="email" required aria-label="Email address">
-      <button type="submit">Send My Chapter</button>
+      <button type="submit">Keep Me Posted</button>
     </form>
     <div class="formok" id="formOk" role="status" aria-live="polite"></div>
     <div class="formnote">No spam. One note when it's out. Unsubscribe anytime.</div>
@@ -224,10 +231,11 @@
 
   <!-- THE CASE -->
   <section class="case">
-    <p class="first">The book rests on one measurement: 164 songwriters scored across eight measures of songcraft — who built the form, not who got famous singing inside it.</p>
+    <p class="first">The book rests on one measurement: 164 songwriters scored across eight measures of songcraft &mdash; the lyric, the melody, the structure, how far a writer's work traveled into other hands. It never counts who is famous. It only weighs what was built.</p>
     <p>Then that score is set against what the institutions already decided: the Grammys, the Halls of Fame, the magazine lists, added into a single number. <b>The distance between the two is the gap, and the gap is the finding.</b> Roughly half the book moves more than thirty places between what someone built and the credit they were given.</p>
-    <p>Take Thomas Dorsey, who wrote "Take My Hand, Precious Lord" and effectively invented gospel — the language soul, R&amp;B, and rock all grew out of. Add up every honor the institutions ever gave him and he lands 144th of 164. Measure what he actually built and he lands 30th. <b>A gap of 114 places — the largest in the book.</b> They let him in the door and stood him against the back wall of the room he built.</p>
-    <p>And it isn't one machine's opinion. Run 226 billion plays by people who never heard of me — the largest record of what listeners actually do — and it draws the same map, putting the right writers side by side without being told the history. Two measurements pointing one way, and a mountain of raw behavior pointing the same way.</p>
+    <p>Take Thomas Dorsey, who wrote "Take My Hand, Precious Lord" and effectively invented gospel &mdash; the language soul, R&amp;B, and rock all grew out of. Add up every honor the institutions ever gave him and he lands 144th of 164. Measure what he actually built and he lands 30th. <b>A gap of 114 places &mdash; the largest in the book.</b> They let him in the door and stood him against the back wall of the room he built.</p>
+    <p>Then there is a third witness, one I did not build and could not have rigged: <span class="figure">226 billion</span> plays by people who never heard of me. The score is not made of those plays &mdash; an old gospel record barely gets streamed at all, and the math knows it. What the listening data gives instead is a <b>map</b>: line up who gets played next to whom, and it sets Chuck Berry beside Fats Domino, lays the hip-hop bloodline out in order, and finds the same forgotten builders the famous lists miss &mdash; all without being told a word of the history. My measurement drew one map of this music. Millions of strangers, just listening, drew the same one.</p>
+    <p class="caseclose">Dorsey is the sharpest proof of all. The listening data can't find him &mdash; his songs play constantly, but always under the name of whoever sang them, never his. That silence is not a hole in the method. It <em>is</em> the thing the book is about: build the whole room, hand the songs to other people, and the credit goes to the voices while your name disappears into the walls.</p>
   </section>
 
   <footer>
@@ -272,7 +280,7 @@
       });
       if(res.ok){
         ok.style.color = 'var(--good)';
-        ok.textContent = 'You\u2019re on the list. Check your inbox for the free chapter.';
+        ok.textContent = 'You\u2019re on the list. Look for a note from me soon.';
         form.reset();
       } else {
         throw new Error('bad status');
